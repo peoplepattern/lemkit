@@ -25,3 +25,8 @@ Argument      | options                   |
 Building lemkit with train mode specified creates a number of dependencies. For Python this creates a dependency on Numpy, Scipy, and Scikit-learn. For Scala this creates dependencies on LIBLINEAR and/or Vowpal Wabbit. 
 
 Building lemkit only in predict mode has no dependencies.
+
+### Running lemkit
+
+Information on running lemkit can be found in the [wiki](https://github.com/peoplepattern/lemkit/wiki)
+
