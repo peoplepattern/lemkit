@@ -1,4 +1,6 @@
 import json
+import io
+from operator import itemgetter
 
 def writeBinaryModel(filename, weights, feature_index, label_index,
 					 hash_trick, hashmod, sparse="False"):
@@ -115,7 +117,7 @@ def writeBinaryModel(filename, weights, feature_index, label_index,
 
 	#print "Done writing to ", filename
 
-def json_save(model_file, coefs, label_index, feature_index, hash_trick, hashmod):
+def writeJsonModel(model_file, coefs, label_index, feature_index, hash_trick, hashmod):
 
 	def write_feature_info_section(w, feature_index, hash_trick, hashmod):
 		parent_dict, write_dict = {}, {}
