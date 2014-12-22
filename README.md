@@ -3,7 +3,7 @@ lemkit
 
 Utilities for training linear classifiers in Scala and Python. Models are output in a lightweight standardized format. Trained models can then be utilized in Scala, Python, or Go to classify unlabeled data.
 
-### Setting up Lemkit
+### Setting up lemkit
 
 Begin by cloning the repository and exporting the $LEMKIT environment variable.
 
@@ -11,9 +11,22 @@ Begin by cloning the repository and exporting the $LEMKIT environment variable.
     cd lemkit
     export LEMKIT=$(pwd)
 
-### Build and install Lemkit 
+### Build and install lemkit 
 
-Build and install lemkit in the desired language and mode. To build Lemkit in Python and Scala for training and predicting execute this command:
+Build and install lemkit in the desired language and mode. To build lemkit in Python and Scala for training and predicting execute this command:
 
     $LEMKIT/build.sh -l python,scala -m train,predict
+
+Argument      | options                   |
+--------------|---------------------------|
+-l (languages)|scala,python,go (1 or more)|
+-m (modes)    |predict,train (1 or more)  |
+
+Building lemkit with train mode specified creates a number of dependencies. For Python this creates a dependency on Numpy, Scipy, and Scikit-learn. For Scala this creates dependencies on LIBLINEAR and/or Vowpal Wabbit. 
+
+Building lemkit only in predict mode has no dependencies.
+
+### Running lemkit
+
+Information on running lemkit can be found in the [wiki](https://github.com/peoplepattern/lemkit/wiki)
 

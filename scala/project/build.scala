@@ -11,7 +11,7 @@ object LemkitBuild extends Build {
   import Implicits._
 
   override val settings = super.settings ++ Seq(
-    organization := "io.people8",
+    organization := "com.peoplepattern",
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -22,7 +22,7 @@ object LemkitBuild extends Build {
       "-target:jvm-1.7",
       "-encoding", "UTF-8"),
     scalaVersion := "2.10.4",
-    initialCommands := "import io.people8._"
+    initialCommands := "import com.peoplepattern.classify"
   )
 
   lazy val root = Project(id = "lemkit", base = file("."))
@@ -38,8 +38,32 @@ object LemkitBuild extends Build {
     .settings(coverallsSettings: _*)
 
   lazy val lemkitTrain = Project(id = "lemkit-train", base = file("lemkit-train"))
+    .dependsOnLib("org.scalatest" %% "scalatest" % "2.2.1" % "test")
     .dependsOn(lemkitModel)
-    .settings(startScriptForClassesSettings : _*)
+    .settings(scalariformSettings: _*)
+    .settings(instrumentSettings: _*)
+    .settings(coverallsSettings: _*)
+    .settings(startScriptForClassesSettings: _*)
+    .configs(AllTest)
+    .configs(VowpalTest)
+    .configs(LibLinearTest)
+    .settings(inConfig(AllTest)(Defaults.testTasks): _*)
+    .settings(inConfig(VowpalTest)(Defaults.testTasks): _*)
+    .settings(inConfig(LibLinearTest)(Defaults.testTasks): _*)
+    .settings(
+      testOptions in Test := Seq(Tests.Filter(unitFilter)),
+      testOptions in AllTest := Seq(Tests.Filter(allFilter)),
+      testOptions in VowpalTest := Seq(Tests.Filter(vowpalFilter)),
+      testOptions in LibLinearTest := Seq(Tests.Filter(libLinearFilter)))
+
+  def vowpalFilter(name: String): Boolean = name endsWith "VowpalSpec"
+  def libLinearFilter(name: String): Boolean = name endsWith "LibLinearSpec"
+  def unitFilter(name: String): Boolean = (name endsWith "Spec") && !vowpalFilter(name) && !libLinearFilter(name)
+  def allFilter(name: String): Boolean = name endsWith "Spec"
+
+  lazy val AllTest = config("all") extend(Test)
+  lazy val VowpalTest = config("vowpal") extend(Test)
+  lazy val LibLinearTest = config("liblinear") extend(Test)
 }
 
 object Implicits {
