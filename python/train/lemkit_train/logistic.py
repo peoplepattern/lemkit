@@ -55,7 +55,7 @@ def train(trainfile, model_file, save_mode="json", hash_trick=False,  regulariza
 	coefs = model.coef_
 
 	if save_mode == "json":
-		lemkit_train.json_save(model_file, coefs, label_index, feature_index,
+		lemkit_train.writeJsonModel(model_file, coefs, label_index, feature_index,
 			  hash_trick, hashmod)
 	if save_mode == "binary":
 		lemkit_train.writeBinaryModel(model_file, coefs, feature_index, label_index,
