@@ -11,8 +11,9 @@ Begin by cloning the repository and exporting the $LEMKIT environment variable.
     cd lemkit
     export LEMKIT=$(pwd)
 
-### Build and install lemkit 
+### Build and install Lemkit 
 
 Build and install lemkit in the desired language and mode. To build Lemkit in Python and Scala for training and predicting execute this command:
 
-   $LEMKIT/build.sh -l python,scala -m train,predict
+    $LEMKIT/build.sh -l python,scala -m train,predict
+
