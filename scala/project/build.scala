@@ -38,7 +38,11 @@ object LemkitBuild extends Build {
     .settings(coverallsSettings: _*)
 
   lazy val lemkitTrain = Project(id = "lemkit-train", base = file("lemkit-train"))
+    .dependsOnLib("org.scalatest" %% "scalatest" % "2.2.1" % "test")
     .dependsOn(lemkitModel)
+    .settings(scalariformSettings: _*)
+    .settings(instrumentSettings: _*)
+    .settings(coverallsSettings: _*)
     .settings(startScriptForClassesSettings : _*)
 }
 

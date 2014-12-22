@@ -1,0 +1,21 @@
+{
+  "labels":{
+    "Iris-virginica":2,
+    "Iris-setosa":0,
+    "Iris-versicolor":1
+  },
+  "features":{
+    "type":"exact",
+    "features":{
+      "":0,
+      "sepal-width":2,
+      "petal-length":3,
+      "sepal-length":1,
+      "petal-width":4
+    }
+  },
+  "weights":{
+    "type":"dense",
+    "values":[[0.42899,0.125613,1.712036,-2.214484,-0.754824],[0.567636,0.426266,-1.413687,0.603592,-1.531267],[-1.22069,-1.038105,-1.901427,1.961815,2.268535]]
+  }
+}
