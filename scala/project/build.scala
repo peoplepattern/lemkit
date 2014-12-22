@@ -43,7 +43,27 @@ object LemkitBuild extends Build {
     .settings(scalariformSettings: _*)
     .settings(instrumentSettings: _*)
     .settings(coverallsSettings: _*)
-    .settings(startScriptForClassesSettings : _*)
+    .settings(startScriptForClassesSettings: _*)
+    .configs(AllTest)
+    .configs(VowpalTest)
+    .configs(LibLinearTest)
+    .settings(inConfig(AllTest)(Defaults.testTasks): _*)
+    .settings(inConfig(VowpalTest)(Defaults.testTasks): _*)
+    .settings(inConfig(LibLinearTest)(Defaults.testTasks): _*)
+    .settings(
+      testOptions in Test := Seq(Tests.Filter(unitFilter)),
+      testOptions in AllTest := Seq(Tests.Filter(allFilter)),
+      testOptions in VowpalTest := Seq(Tests.Filter(vowpalFilter)),
+      testOptions in LibLinearTest := Seq(Tests.Filter(libLinearFilter)))
+
+  def vowpalFilter(name: String): Boolean = name endsWith "VowpalSpec"
+  def libLinearFilter(name: String): Boolean = name endsWith "LibLinearSpec"
+  def unitFilter(name: String): Boolean = (name endsWith "Spec") && !vowpalFilter(name) && !libLinearFilter(name)
+  def allFilter(name: String): Boolean = name endsWith "Spec"
+
+  lazy val AllTest = config("all") extend(Test)
+  lazy val VowpalTest = config("vowpal") extend(Test)
+  lazy val LibLinearTest = config("liblinear") extend(Test)
 }
 
 object Implicits {
