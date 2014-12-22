@@ -1,4 +1,6 @@
 import json
+import io
+from operator import itemgetter
 
 def writeBinaryModel(filename, weights, feature_index, label_index,
 					 hash_trick, hashmod, sparse="False"):
