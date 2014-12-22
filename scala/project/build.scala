@@ -11,7 +11,7 @@ object LemkitBuild extends Build {
   import Implicits._
 
   override val settings = super.settings ++ Seq(
-    organization := "io.people8",
+    organization := "com.peoplepattern",
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
@@ -22,7 +22,7 @@ object LemkitBuild extends Build {
       "-target:jvm-1.7",
       "-encoding", "UTF-8"),
     scalaVersion := "2.10.4",
-    initialCommands := "import io.people8._"
+    initialCommands := "import com.peoplepattern.classify"
   )
 
   lazy val root = Project(id = "lemkit", base = file("."))
