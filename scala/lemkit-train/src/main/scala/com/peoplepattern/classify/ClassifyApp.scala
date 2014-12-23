@@ -26,9 +26,6 @@ object Classify extends App {
   //var bfExpectedNumEls: Option[Int] = None
   //var bfFalsePosProb: Option[Double] = None
 
-  type FeatObs = FeatureObservation[String]
-  type Examp = Example[String, Seq[FeatObs]]
-
   var i = 0
   val len = args.size
 
@@ -101,10 +98,6 @@ object Classify extends App {
     }
   }
 
-  object IdentityFeaturizer extends Featurizer[Seq[FeatObs], String] {
-    def apply(input: Seq[FeatObs]) = input
-  }
-
   val hashOptions = HashingOptions(hashtrick = hashtrick)
 
   // Train classifier or read in model
@@ -119,7 +112,7 @@ object Classify extends App {
           options.featureSelectionMultiple = featureSelectionMultiple
           defaultOptions.map { options.defaultOptions = _ }
           extraOptions.map { options.extraOptions = _ }
-          VowpalClassifier.train(trainData, IdentityFeaturizer, options)
+          VowpalClassifier.train(trainData, options)
         }
         case "liblinear" => {
           val options = LibLinearClassifierOptions(hashOptions)
@@ -127,15 +120,15 @@ object Classify extends App {
           options.verbose = verbose
           defaultOptions.map { options.defaultOptions = _ }
           extraOptions.map { options.extraOptions = _ }
-          LibLinearClassifier.train(trainData, IdentityFeaturizer, options)
+          LibLinearClassifier.train(trainData, options)
         }
       }
     }
     case (_, Some(file)) => {
       if (modelFormat == "json")
-        LinearClassifier.readJSONModel(file, IdentityFeaturizer)
+        LinearClassifier.readJSONModel(file)
       else
-        LinearClassifier.readBinaryModel(file, IdentityFeaturizer)
+        LinearClassifier.readBinaryModel(file)
     }
 
     case (None, None) => {
@@ -148,9 +141,7 @@ object Classify extends App {
   writeModel match {
     case Some(file) => {
       classifier match {
-        case xcfier: LinearClassifier[_] => {
-          // Type erasure sucks
-          val cfier = xcfier.asInstanceOf[LinearClassifier[FeatObs]]
+        case cfier: LinearClassifier => {
           if (modelFormat == "json")
             LinearClassifier.writeJSONModel(cfier, file)
           else

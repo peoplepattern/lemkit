@@ -5,9 +5,6 @@ import scala.io.Source
 import data._
 
 object ClassifierSource {
-  type FeatObs = FeatureObservation[String]
-  type Examp = Example[String, Seq[FeatObs]]
-
   /**
    * Read a file into a series of instances, each of which is an Example,
    * where the data in the instance is directly stored as a sequence of
@@ -17,7 +14,7 @@ object ClassifierSource {
    *
    * The value can be omitted, and defaults to 1.0.
    */
-  def readDataFile(file: String): Iterator[Examp] =
+  def readDataFile(file: String): Iterator[Example[String, String]] =
     readDataSource(Source.fromFile(file))
 
   /**
@@ -32,7 +29,7 @@ object ClassifierSource {
    *
    * The value can be omitted, and defaults to 1.0.
    */
-  def readDataSource(source: Source): Iterator[Examp] = {
+  def readDataSource(source: Source): Iterator[Example[String, String]] = {
     for (line <- source.getLines) yield {
       val label_feats = line.split("""\|""")
       require(label_feats.size == 2,
@@ -52,10 +49,10 @@ object ClassifierSource {
         if (featval.size == 1) (field, 1.0)
         else (featval(0), featval(1).toDouble)
       }
-      Example(label, features.toSeq.map {
+      Example(features.toSeq.map {
         case (feature, value) =>
           FeatureObservation(feature, value)
-      }, importance = importance)
+      }, label, importance = importance)
     }
   }
 }

@@ -40,9 +40,8 @@ object LibLinearClassifier extends LinearClassifierTrainer {
    * Train a LIBLINEAR classifier. Currently fixes most of the options to
    * reasonable values for some of our standard use cases.
    */
-  def train[I](
-    trainingExamples: TraversableOnce[Example[String, I]],
-    featurizer: Featurizer[I, String],
+  def train(
+    trainingExamples: TraversableOnce[Example[String, String]],
     options: LibLinearClassifierOptions,
     filePrefix: String = "train") = {
 
@@ -58,7 +57,7 @@ object LibLinearClassifier extends LinearClassifierTrainer {
 
     // Index and write the training examples in LIBLINEAR format.
     val (indexer, numExamples) =
-      LibLinearIndexer.indexAndWriteExamples(trainingExamples, featurizer,
+      LibLinearIndexer.indexAndWriteExamples(trainingExamples,
         trainingFile, options.hashingOptions)
 
     val lmap = indexer.lmap
@@ -89,7 +88,7 @@ object LibLinearClassifier extends LinearClassifierTrainer {
     // Read the parameters from the file.
     val parameters = readParameters(modelFile, numClasses, fmapFinal.size)
 
-    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal, featurizer),
+    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal),
       parameters)
   }
 

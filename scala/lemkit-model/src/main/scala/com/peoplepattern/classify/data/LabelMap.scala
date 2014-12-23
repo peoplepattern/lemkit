@@ -17,15 +17,6 @@ package com.peoplepattern.classify.data
 */
 
 /**
- * Something that has a label.
- *
- * @author dlwh
- */
-trait Labeled[+L] {
-  def label: L
-}
-
-/**
  * A trait for classes that indexes labels and get labels of indexes.
  */
 trait LabelMap[L] extends Serializable {
