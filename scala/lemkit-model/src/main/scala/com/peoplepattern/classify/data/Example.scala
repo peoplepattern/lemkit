@@ -1,4 +1,5 @@
-package com.peoplepattern.classify.data
+package com.peoplepattern.classify
+package data
 
 /**
  * A single data instance, consisting of a label and collection of features
@@ -10,7 +11,7 @@ package com.peoplepattern.classify.data
  */
 trait Example[T, +L] extends Serializable {
   outer =>
-  def features: Seq[FeatureObservation[T]]
+  def features: FeatureSet[T]
   def label: L
   def id: String
   def importance: Option[Double] = None
@@ -19,7 +20,7 @@ trait Example[T, +L] extends Serializable {
    * Converts the features in this example to a different one while still
    * preserving label and id.
    */
-  def map[U](f: Seq[FeatureObservation[T]] => Seq[FeatureObservation[U]]): Example[U, L] = new Example[U, L] {
+  def map[U](f: FeatureSet[T] => FeatureSet[U]): Example[U, L] = new Example[U, L] {
     val features = f(outer.features)
     val label = outer.label
     override val importance = outer.importance
@@ -41,7 +42,7 @@ trait Example[T, +L] extends Serializable {
    * Converts the features in this example to a different one while still
    * preserving label and id.
    */
-  def flatMap[U](f: Seq[FeatureObservation[T]] => Seq[FeatureObservation[U]]) = map(f)
+  def flatMap[U](f: FeatureSet[T] => FeatureSet[U]) = map(f)
 
   override def toString = {
     s"Example { id = $id, label = $label, importance = $importance, features = $features }"
@@ -58,7 +59,7 @@ object Example {
   /**
    * Create a new Example.
    */
-  def apply[T, L](features: Seq[FeatureObservation[T]], label: L,
+  def apply[T, L](features: FeatureSet[T], label: L,
     id: String = "", importance: Option[Double] = None): Example[T, L] = {
     val f = features
     val l = label
@@ -76,5 +77,5 @@ object Example {
    * Lifts a function to operate over Examples,
    * rather than the contained object.
    */
-  def lift[T, U, L](f: Seq[FeatureObservation[T]] => Seq[FeatureObservation[U]]) = (o: Example[T, L]) => o.map(f)
+  def lift[T, U, L](f: FeatureSet[T] => FeatureSet[U]) = (o: Example[T, L]) => o.map(f)
 }

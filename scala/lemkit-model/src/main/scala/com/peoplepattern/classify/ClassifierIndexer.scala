@@ -10,7 +10,7 @@ import FeatureObservation.condense
 class ClassifierIndexer(
     val lmap: Map[String, Int],
     val fmap: FeatureMap) {
-  def apply(features: Seq[FeatureObservation[String]]): Seq[FeatureObservation[Int]] = {
+  def apply(features: FeatureSet[String]): FeatureSet[Int] = {
     // Get the features. Multiple strings may map to the same integers due
     // to the feature trick so we need to condense the feature counts.
     // Add intercept as an extra feature with empty-string name.
@@ -23,7 +23,7 @@ object ClassifierIndexer {
   protected def indexExamples(
     examples: TraversableOnce[Example[String, String]],
     lmap: GrowableIndex[String],
-    toIndex: Seq[FeatureObservation[String]] => Seq[FeatureObservation[Int]]) = {
+    toIndex: FeatureSet[String] => FeatureSet[Int]) = {
     for (ex <- examples) yield ex.relabel(lmap)
       // add intercept
       .map(FeatureObservation("", 1.0) +: _)

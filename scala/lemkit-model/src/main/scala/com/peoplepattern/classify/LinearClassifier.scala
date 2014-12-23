@@ -26,7 +26,7 @@ import util.NumNormalizer._
 class LinearClassifier(
     private val indexer: ClassifierIndexer,
     private val parameters: Array[Array[Double]]) extends IndexingClassifier(indexer) {
-  def rawEvalFeatures(feats: Seq[FeatureObservation[Int]]): Seq[Double] = {
+  def rawEvalFeatures(feats: FeatureSet[Int]): Seq[Double] = {
     val numClasses = indexer.lmap.size
 
     // Start with zero array
@@ -39,7 +39,7 @@ class LinearClassifier(
     scoresLogs.toSeq
   }
 
-  def scores(feats: Seq[FeatureObservation[String]]): Seq[(String, Double)] = {
+  def scores(feats: FeatureSet[String]): Seq[(String, Double)] = {
     labels zip sumNormalize(exp(evalRaw(feats)))
   }
 }
