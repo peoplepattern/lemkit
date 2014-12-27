@@ -7,6 +7,12 @@ import data.FeatureObservation
  */
 trait Classifier {
   /**
+   * The sequence of labels of the classifier, can be
+   * zipped correctly with the output of `evalRaw`
+   */
+  def labels: Seq[String]
+
+  /**
    * Classify a data instance defined by a set of features, returning the
    * predicted label.
    */
@@ -19,12 +25,6 @@ trait Classifier {
    * to the predicted label; scores are not necessarily in the range [0,1]
    */
   def evalRaw(feats: FeatureSet[String]): Seq[Double]
-
-  /**
-   * The sequence of labels of the classifier, can be
-   * zipped correctly with the output of `evalRaw`
-   */
-  def labels: Seq[String]
 
   /**
    * Classify a data instance defined by a set of features, returning a
