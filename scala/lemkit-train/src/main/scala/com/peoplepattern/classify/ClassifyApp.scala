@@ -3,7 +3,7 @@ package com.peoplepattern.classify
 import scala.util.control.Breaks._
 import data._
 
-object Classify extends App {
+object ClassifyApp extends App {
   var regularization: Option[Double] = None
   var verbose = false
   var hashtrick: Option[Int] = None
