@@ -35,9 +35,9 @@ model = lemkit.models.LinearModel()
 if args.hash is None or (args.hash).isdigit() == True:
 	model.train(args.train, args.modelmethod,
 			    args.reg, args.hash, args.hash)
-	if args.mf == 'binary':
+	if args.model_format == 'binary':
 		model.writeBinary(args.outfile, args.sparse)
-	elif args.mf == 'json':
+	elif args.model_format == 'json':
 		model.writeJson(args.outfile)
 else:
 	print >> sys.stderr, "ERROR: Problem interpreting --hash argument. It should be an integer."

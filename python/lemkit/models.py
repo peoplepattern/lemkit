@@ -26,10 +26,11 @@ class LinearModel:
 			  hash_trick=False, hashmod=100000,
 			  output_hash=False, output_hash_file="tmp_hash.schema.txt"):
 
-		if model_type=="logistic":
+		if model_method=="logistic":
 			from lemkit.train import logistic
 			label_index, feature_index, weight_matrix = logistic.train(train_file, 
 																 hash_trick,
+																 regularization,
 								  							     hashmod, 
 								  							     output_hash,
 								  								 output_hash_file)
@@ -63,27 +64,27 @@ class LinearModel:
 						    predict_file)
 		elif self.hashmod is not None:
 			if self.nonzero_indices is not None:
-	            predictions = hashed_predict_sparse(self.weight_matrix,
-	            									self.label_index,
-	            									self.hashmod,
-	                                    			predict_file,
-	                                    			self.nonzero_indices)
-	        else:
-	        	predictions = hashed_predict(self.weight_matrix,
-	        								 self.label_index,
-	        								 self.hashmod,
-	        								 predict_file)
+				predictions = hashed_predict_sparse(self.weight_matrix,
+													self.label_index,
+													self.hashmod,
+				                        			predict_file,
+				                        			self.nonzero_indices)
+			else:
+				predictions = hashed_predict(self.weight_matrix,
+											 self.label_index,
+											 self.hashmod,
+											 predict_file)
 		else:
 			print "ERROR"
 			print "Feature Index and hashmod not set", self.feature_index, self.hashmod
 
 		if outfile is not None:
-	        with io.open(outfile, 'w', encoding='utf-8') as w:
-	            for p in predictions:
-	                w.write(u' '.join(p[:-1]) + '\n')
-	        print "Writing predictions complete check them @ ", outfile
+			with io.open(outfile, 'w', encoding='utf-8') as w:
+			    for p in predictions:
+			        w.write(u' '.join(p[:-1]) + '\n')
+			print "Writing predictions complete check them @ ", outfile
 
-	    return predictions
+		return predictions
 
 	def readBinary(self, model_file):
 		from lemkit import model_tools
@@ -115,7 +116,7 @@ class LinearModel:
 		model_tools.writeBinaryModel(model_file, self.weight_matrix,
 									 self.feature_index, self.label_index,
 									 self.hash_trick, self.hashmod,
-									 self.majorVersion, self.minorVersion
+									 self.majorVersion, self.minorVersion,
 									 sparse)
 
 	#Currently only writes dense matrix format

@@ -26,9 +26,9 @@ args = pa.parse_args()
 import lemkit
 
 model = lemkit.models.LinearModel()
-if args.mf == 'binary':
+if args.model_format == 'binary':
 	model.readBinary(args.model)
-elif args.mf == 'json':
+elif args.model_format == 'json':
 	model.readJson(args.model)
 
 p = model.predict(args.predict, args.outfile)

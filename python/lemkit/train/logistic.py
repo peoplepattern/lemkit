@@ -1,11 +1,15 @@
 import io, sys
 import numpy, scipy
+from scipy.sparse import csr_matrix
+from sklearn import linear_model
 from operator import itemgetter
 
+# attempt to import fast c implementation, if fails go to slow backup
 try:
-	import mmh3 as mh
-	print>>sys.stderr, "mmh3 not installed, switching to slow Python implementation"
-	import murmurh3 as mh
+    import mmh3 as mh
+except:
+    print>>sys.stderr, "mmh3 not installed, switching to slow Python implementation"
+    from lemkit.predict import murmurh3 as mh
 
 #trainfile format:
 #
@@ -25,11 +29,11 @@ try:
 #	mapping of integers to native feature strings
 #output_hash_file = if output_hash is set to true the feature mapping will be
 #	written to this file
-def train(train_file, hash_trick=False,  regularization="L1",
+def train(train_file, hash_trick=False, regularization="L1",
 		  hashmod=100000, output_hash=False,
 		  output_hash_file="tmp_hash.schema.txt"):
 
-	Y, X, label_index, feature_index = extract_vectors(trainfile, hash_trick, hashmod,
+	Y, X, label_index, feature_index = extract_vectors(train_file, hash_trick, hashmod,
 													   output_hash, output_hash_file)
 
 	#fit_intercept = False means scitkit does not automatically add constant feature
@@ -89,7 +93,7 @@ def extract_vectors(trainfile, hash_trick, hashmod, output_hash, output_hash_fil
 			for feat_val in feature_index:
 				w.write(feat_val + '\t' + unicode(feature_index[feat_val]) + '\r\n')
 
-	X = scipy.sparse.csr_matrix((scipy.array(values, dtype=scipy.float64), scipy.array(col_indexes),
+	X = csr_matrix((scipy.array(values, dtype=scipy.float64), scipy.array(col_indexes),
 	 scipy.array(row_indexes)), shape=(j, i), dtype=scipy.float64)
 	Y = scipy.array(labels)
 
