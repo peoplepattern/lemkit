@@ -1,9 +1,11 @@
 import json
 import io
+import sys
 from operator import itemgetter
 
 def writeBinaryModel(filename, weights, feature_index, label_index,
-					 hash_trick, hashmod, sparse="False"):
+					 hash_trick, hashmod, majorVersion, minorVersion,
+					 sparse="False"):
 	from struct import pack
 	
 	def write_int(w, int1):
@@ -32,7 +34,7 @@ def writeBinaryModel(filename, weights, feature_index, label_index,
 	def get_nonzero_indices(weights):
 		i = 0
 		non_zeros = []
-		for col in weights.transpose():
+		for col in map(lambda *a: list(a), *weights):
 			if len(set(col)) > 1:
 				non_zeros.append(i)
 			i += 1
@@ -65,8 +67,6 @@ def writeBinaryModel(filename, weights, feature_index, label_index,
 	#weightsValuesID = integer identifier for weight matrix start
 
 	magicNumber = 0x6A48B9DD
-	majorVersion = 1
-	minorVersion = 0
 	labelID = 100
 	featureTypeID = 110
 	featureTypeExact = 1
@@ -135,7 +135,7 @@ def writeJsonModel(model_file, coefs, label_index, feature_index, hash_trick, ha
 		parent_dict, write_dict = {}, {}
 		write_dict["type"] = "dense"
 		weights = coefs
-		write_dict["values"] = weights.tolist()
+		write_dict["values"] = weights
 		return write_dict
 
 	with open(model_file, 'w') as w:
@@ -146,3 +146,113 @@ def writeJsonModel(model_file, coefs, label_index, feature_index, hash_trick, ha
 		parent_dict["features"] = feature_section
 		parent_dict["weights"] = weights_section
 		w.write(json.dumps(parent_dict, indent=4, sort_keys=True))
+
+def readJsonModel(filename):
+	with open(model, 'r') as r:
+		model_json = json.load(r)
+		if model_json['features']['type'] == 'exact':
+			weight_matrix = model_json['weights']['values']
+			label_index = model_json['labels']
+			feature_index = model_json['features']['features']
+			hashmod = None
+		elif model_json['features']['type'] == 'hashed':
+			weight_matrix = model_json['weights']['values']
+			label_index = model_json['labels']        	
+			hashmod = model_json['features']['maxfeats']
+			feature_index = None
+	return weight_matrix, label_index, feature_index, hashmod
+
+def readBinaryModel(filename, model_majorVersion, model_minorVersion):
+	from struct import unpack
+	
+	def read_int(r):
+		return unpack('>i', r.read(4))[0]
+
+	def read_short(r):
+		return unpack('>h', r.read(2))[0]
+
+	def read_string(r):
+		length = read_int(r)
+		return unpack(">%ds" % length, r.read(length))[0]
+
+	def read_double(r):
+		return unpack('>d', r.read(8))[0]
+
+	def convert_list_to_dict(alist):
+		adict = {}
+		j = 0
+		for i in alist:
+			adict[i] = j
+			j += 1
+		return adict
+
+	def read_list(r):
+		alist = []
+		list_length = read_int(r)
+		for i in range(1, list_length + 1):
+			alist.append(read_string(r))
+		return alist
+
+	def read_table(r):
+		adict = {}
+		table_length = read_int(r)
+		for i in range(1, table_length + 1):
+			s1 = read_string(r)
+			r1 = read_int(r)
+			adict[s1] = r1
+		return adict
+
+	model = {}
+	hashmod = None
+	featureFeaturesID = None
+	feature_index = None
+	maxfeatsID = None
+	hashmod = None
+	nonzero_indices = None
+
+	with io.open(filename, 'rb') as r:
+		magicNumber = read_int(r)
+		majorVersion = read_short(r)
+		minorVersion = read_short(r)
+		if ((majorVersion > model_majorVersion) or (majorVersion == model_majorVersion and minorVersion > model_minorVersion)):
+			print>>sys.stderr, "ERROR"
+			print>>sys.stderr, "Version number greater than anticipated"
+			print>>sys.stderr, "Reading version", str(majorVersion)+"."+str(minorVersion)
+			print>>sys.stderr, "Anticipating version", str(model_majorVersion)+"."+str(model_minorVersion)
+			sys.exit()
+		labelID = read_short(r)
+		label_index = read_table(r)
+		featureTypeID = read_short(r)
+		feature_hashing = read_short(r)
+		# IF 1 then should be exact features
+		if feature_hashing == 1:
+			featureFeaturesID = read_short(r)
+			feature_index = convert_list_to_dict(read_list(r))
+		elif feature_hashing == 2:
+			maxfeatsID = read_short(r)
+			hashmod = read_int(r)
+		weightsTypeID = read_short(r)
+		weightsType = read_short(r)
+		if weightsType == 1:
+			weightsValuesID = read_short(r)
+			weight_length = read_int(r)
+			weights = []
+			for i in range(1, weight_length + 1):
+				row_length = read_int(r)
+				weights.append([read_double(r)
+				                for i in range(1, row_length + 1)])
+		elif weightsType == 2:
+			weightsValuesID = read_short(r)
+			weight_length = read_int(r)
+			nonzero_indices_length = read_int(r)
+			nonzero_indices = {}
+			weights = []
+			for i in range(1, nonzero_indices_length + 1):
+				nonzero_indices[read_int(r)] = i - 1
+				# nonzero_indices.append(read_int(r))
+			for i in range(1, weight_length + 1):
+				weights.append([read_double(r)
+				                for j in range(1, nonzero_indices_length + 1)])
+
+	return weights, label_index, feature_index, hashmod, nonzero_indices
+

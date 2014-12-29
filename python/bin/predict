@@ -4,10 +4,7 @@
 #example: commons-predict -m /path/to/trained_model.model -p /path/to/test_on_this.txt -o /path/to/outfile.txt
 
 import os, sys
-import timeit
 import argparse
-
-import lemkit_predict
 
 pa = argparse.ArgumentParser(description='Linear classifier prediction')
 pa.add_argument('-m', '--model', action='store', required=True,
@@ -26,7 +23,15 @@ pa.add_argument('-o', '--outfile', action='store',
 
 args = pa.parse_args()
 
-p = lemkit_predict.predict(args.model, args.predict, args.model_format, None)
+import lemkit
+
+model = lemkit.models.LinearModel()
+if args.model_format == 'binary':
+	model.readBinary(args.model)
+elif args.model_format == 'json':
+	model.readJson(args.model)
+
+p = model.predict(args.predict, args.outfile)
 
 if args.outfile == None:
 	output = sys.stdout

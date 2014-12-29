@@ -1,25 +1,15 @@
-#The purpose of the script is to encourage model serialization and
-#interoperability between models trained in Vowpal_Wabbit and Scikit-Learn
-#And to encourage portability between these models for Python, Scala, Go
-
-#This script takes in a file of features, it then:
-#(1) Hashes the features using murmurhash 3 implementation
-#(2) trains using a SciKit linear model
-#(3) saves the model into a portable json forat
-
 import io, sys
-
 import numpy, scipy
-
+from scipy.sparse import csr_matrix
 from sklearn import linear_model
 from operator import itemgetter
-import lemkit_train
 
+# attempt to import fast c implementation, if fails go to slow backup
 try:
-	import mmh3 as mh
+    import mmh3 as mh
 except:
-	print>>sys.stderr, "mmh3 not installed, switching to slow Python implementation"
-	import murmurh3 as mh
+    print>>sys.stderr, "mmh3 not installed, switching to slow Python implementation"
+    from lemkit.predict import murmurh3 as mh
 
 #trainfile format:
 #
@@ -34,34 +24,27 @@ except:
 #	to map strings to features. If false it will create a sequential mapping of features
 #	from 1 to N where N = number of features
 #hashmod = hashing trick constrains number of unique features to a given integer
-#	defaults to 1,000,000
+#	defaults to 100,000
 #output_hash = if set to True it will output a schema file that describes
 #	mapping of integers to native feature strings
 #output_hash_file = if output_hash is set to true the feature mapping will be
 #	written to this file
-def train(trainfile, model_file, save_mode="json", hash_trick=False,  regularization="L1",
-				   hashmod=1000000, output_hash=False, sparse_output="False", output_hash_file="tmp_hash.schema.txt"):
+def train(train_file, hash_trick=False, regularization="L1",
+		  hashmod=100000, output_hash=False,
+		  output_hash_file="tmp_hash.schema.txt"):
 
-	Y, X, label_index, feature_index = extract_vectors(trainfile, hash_trick, hashmod,
+	Y, X, label_index, feature_index = extract_vectors(train_file, hash_trick, hashmod,
 													   output_hash, output_hash_file)
-
 
 	#fit_intercept = False means scitkit does not automatically add constant feature
 	# we do this manually so we set to False
 	model = linear_model.LogisticRegression(penalty=regularization.lower(), fit_intercept=False)
-
 	model.fit(X, Y)
-
 	coefs = model.coef_
 
-	if save_mode == "json":
-		lemkit_train.writeJsonModel(model_file, coefs, label_index, feature_index,
-			  hash_trick, hashmod)
-	if save_mode == "binary":
-		lemkit_train.writeBinaryModel(model_file, coefs, feature_index, label_index,
-						 hash_trick, hashmod, sparse=sparse_output)
+	return label_index, feature_index, coefs.tolist()
 
-	print "Training Complete Check model file @ ", model_file
+
 
 #Vectorize input data into relevant scipy matrices
 def extract_vectors(trainfile, hash_trick, hashmod, output_hash, output_hash_file):
@@ -110,14 +93,8 @@ def extract_vectors(trainfile, hash_trick, hashmod, output_hash, output_hash_fil
 			for feat_val in feature_index:
 				w.write(feat_val + '\t' + unicode(feature_index[feat_val]) + '\r\n')
 
-	X = scipy.sparse.csr_matrix((scipy.array(values, dtype=scipy.float64), scipy.array(col_indexes),
+	X = csr_matrix((scipy.array(values, dtype=scipy.float64), scipy.array(col_indexes),
 	 scipy.array(row_indexes)), shape=(j, i), dtype=scipy.float64)
 	Y = scipy.array(labels)
 
 	return Y, X, label_index, feature_index
-
-def move_features_right(feature_index):
-	new_feature_index = {}
-	for f in feature_index:
-		new_feature_index[f] = feature_index[f]+1
-	return new_feature_index

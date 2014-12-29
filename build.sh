@@ -27,24 +27,10 @@ esac
 case "$lang" in
 	*python*)
 	 printf "Building in Python \n"
-	 case "$mode" in
-	 	*predict*)
-		 printf "Building Predict mode \n"
-		 cd $LEMKIT/python/predict
-		 sudo python setup.py build
-		 sudo python setup.py install
-		 cd $LEMKIT
-		;;
-	 esac
-	 case "$mode" in
-	 	*train*)
-		 printf "Building Train mode \n"
-		 cd $LEMKIT/python/train
-		 sudo python setup.py build
-		 sudo python setup.py install
-		 cd $LEMKIT
-		;;
-	 esac
+	 cd $LEMKIT/python
+	 sudo python setup.py build
+	 sudo python setup.py install
+	 cd $LEMKIT
 	;;
 esac
 		
