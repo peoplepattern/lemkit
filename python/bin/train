@@ -12,14 +12,14 @@ pa.add_argument('-t', '--train', action='store', required=True,
 	help="Formatted file to train on")
 pa.add_argument('-o', '--outfile', action='store', required=True,
 	help="File model will be written to")
-pa.add_argument('-m', '--model', '--mt', '--model-type', action='store',
+pa.add_argument('-m', '--modelmethod', '--mm', '--model-method', action='store',
 	default='logistic', choices=['logistic'], help="type of linear model you want to train (defaults logistic)")
 pa.add_argument('-r', '--reg', '--regularization', action='store',
 	default='L1', choices=['L1','L2'], help="Regularization method (L1 or L2, default L1)")
 pa.add_argument('-f', '--model-format', '--mf', action='store',
 	default='binary', choices=['json', 'binary'],
 	help="Model format (json or binary, default binary)")
-pa.add_argument('--hash', action='store', default=False,
+pa.add_argument('--hash', action='store', default=None,
 	help="If integer given, will use hash trick with a mod value of integer")
 pa.add_argument('-s', '--sparse', action='store', default="False",
 	choices=['True', 'False'], help="Sparse output (True or False)")
@@ -29,13 +29,16 @@ pa.add_argument('-s', '--sparse', action='store', default="False",
 
 args = pa.parse_args()
 
-if args.model == 'logistic':
-	from lemkit_train import logistic
-	if args.hash == False:
-		logistic.train(args.train, args.outfile, save_mode=args.model_format, regularization=args.reg, sparse_output=args.sparse)
-	elif (args.hash).isdigit() == True:
-		logistic.train(args.train, args.outfile, save_mode=args.model_format, regularization=args.reg, hash_trick=True, hashmod=int(args.hash), sparse_output=args.sparse)
-	else:
-		print >> sys.stderr, "ERROR: Problem interpreting --hash argument. It should be an integer."
-		sys.exit()
-	
+import lemkit
+model = lemkit.models.LinearModel()
+
+if args.hash is None or (args.hash).isdigit() == True:
+	model.train(args.train, args.modelmethod,
+			    args.reg, args.hash, args.hash)
+	if args.mf == 'binary':
+		model.writeBinary(args.outfile, args.sparse)
+	elif args.mf == 'json':
+		model.writeJson(args.outfile)
+else:
+	print >> sys.stderr, "ERROR: Problem interpreting --hash argument. It should be an integer."
+	sys.exit()

@@ -17,6 +17,8 @@ class LinearModel:
 	nonzero_index = None
 
 	def __init__(self):
+		self.train_file = ""
+		self.model_file = ""
 
 	def train(self, train_file,
 			  model_method="logistic",
@@ -40,7 +42,7 @@ class LinearModel:
 		if hash_trick != False:
 			self.hash_trick = hash_trick
 			self.hashmod = hashmod
-			
+
 		self.train_file = train_file
 
 	def predict(self, predict_file, outfile=None):

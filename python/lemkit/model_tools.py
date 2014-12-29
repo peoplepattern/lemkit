@@ -34,7 +34,7 @@ def writeBinaryModel(filename, weights, feature_index, label_index,
 	def get_nonzero_indices(weights):
 		i = 0
 		non_zeros = []
-		for col in weights.transpose():
+		for col in map(lambda *a: list(a), *weights):
 			if len(set(col)) > 1:
 				non_zeros.append(i)
 			i += 1
