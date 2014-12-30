@@ -10,41 +10,20 @@ class LinearModel:
 	train_file, model_file = "", ""
 	model_type, model_method = "", ""
 
-	label_index = {}
+	label_index = None
 	feature_index = None
 	weight_matrix = []
 	#nonzero_index only used with sparse binary models
 	nonzero_index = None
 
-	def __init__(self):
-		self.train_file = ""
-		self.model_file = ""
+	def __init__(self, label_index, feature_index, weight_matrix, nonzero_index=None, hash_trick=False, hashmod=None):
+		self.label_index = label_index
+		self.feature_index = feature_index
+		self.weight_matrix = weight_matrix
 
-	def train(self, train_file,
-			  model_method="logistic",
-			  regularization="L1",
-			  hash_trick=False, hashmod=100000,
-			  output_hash=False, output_hash_file="tmp_hash.schema.txt"):
-
-		if model_method=="logistic":
-			from lemkit.train import logistic
-			label_index, feature_index, weight_matrix = logistic.train(train_file, 
-																 hash_trick,
-																 regularization,
-								  							     hashmod, 
-								  							     output_hash,
-								  								 output_hash_file)
-			self.label_index = label_index
-			self.feature_index = feature_index
-			self.weight_matrix = weight_matrix
-			self.model_type = model_method
-
-		#Update Feature Hashing Info
-		if hash_trick != False:
-			self.hash_trick = hash_trick
-			self.hashmod = hashmod
-
-		self.train_file = train_file
+		self.hash_trick = hash_trick
+		self.hashmod = hashmod
+		self.nonzero_index = nonzero_index 
 
 	def predict(self, predict_file, outfile=None):
 

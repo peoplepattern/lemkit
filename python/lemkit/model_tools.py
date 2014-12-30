@@ -2,6 +2,7 @@ import json
 import io
 import sys
 from operator import itemgetter
+from lemkit import models
 
 def writeBinaryModel(filename, weights, feature_index, label_index,
 					 hash_trick, hashmod, majorVersion, minorVersion,
@@ -160,11 +161,16 @@ def readJsonModel(filename):
 			label_index = model_json['labels']        	
 			hashmod = model_json['features']['maxfeats']
 			feature_index = None
-	return weight_matrix, label_index, feature_index, hashmod
+
+	if hashmod is not None:
+		hash_trick = True
+	else: hash_trick = False
+
+	return models.LinearModel(label_index, feature_index, weight_matrix, hash_trick=hash_trick, hashmod=hashmod)
 
 def readBinaryModel(filename, model_majorVersion, model_minorVersion):
 	from struct import unpack
-	
+
 	def read_int(r):
 		return unpack('>i', r.read(4))[0]
 
@@ -254,5 +260,8 @@ def readBinaryModel(filename, model_majorVersion, model_minorVersion):
 				weights.append([read_double(r)
 				                for j in range(1, nonzero_indices_length + 1)])
 
-	return weights, label_index, feature_index, hashmod, nonzero_indices
+	if hashmod is not None:
+		hash_trick = True
+	else: hash_trick = False
+	return models.LinearModel(label_index, feature_index, weights, nonzero_index=nonzero_index, hash_trick=hash_trick, hashmod=hashmod)
 
