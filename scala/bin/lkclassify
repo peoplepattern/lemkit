@@ -1,0 +1,4 @@
+#!/bin/bash
+PROJECT_DIR=$(cd "${BASH_SOURCE[0]%/*}" && pwd -P)/..
+
+"$PROJECT_DIR/lemkit-train/target/start" "$@"
