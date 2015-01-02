@@ -45,7 +45,8 @@ trait Example[T, +L] extends Serializable {
   def flatMap[U](f: FeatureSet[T] => FeatureSet[U]) = map(f)
 
   override def toString = {
-    s"Example { id = $id, label = $label, importance = $importance, features = $features }"
+    "Example { id = %s, label = %s, importance = %s, features = %s }" format (
+      id, label, importance, features)
   }
 }
 
