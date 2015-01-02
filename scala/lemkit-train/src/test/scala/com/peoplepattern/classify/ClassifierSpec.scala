@@ -8,8 +8,6 @@ import org.scalatest._
 
 import data._
 
-import Classify.IdentityFeaturizer
-
 abstract class ClassifierBase(method: String) extends FlatSpec {
   /**
    * Create a temporary file, with reasonable defaults for suffix and base dir.
@@ -25,14 +23,14 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
 
   def readJSONModelResource(res: String) = {
     val resource = Source.fromURL(getClass.getResource(res))
-    LinearClassifier.readJSONModelSource(resource, IdentityFeaturizer)
+    LinearClassifier.readJSONModelSource(resource)
   }
 
   def readBinaryModelResource(res: String) = {
     val resource = getClass.getResource(res).openStream()
     val in = new DataInputStream(new BufferedInputStream(resource))
     try {
-      LinearClassifier.readBinaryModelStream(in, IdentityFeaturizer)
+      LinearClassifier.readBinaryModelStream(in)
     } finally {
       in.close()
     }
@@ -70,7 +68,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
           "Iris-virginica" -> 2
         )
     val fmap = new ExactFeatureMap(featureMap)
-    val indexer = new ClassifierIndexer(labelMap, fmap, IdentityFeaturizer)
+    val indexer = new ClassifierIndexer(labelMap, fmap)
     val weights = Array(
       Array(0.42899, 0.125613, 1.712036, -2.214484, -0.754824),
       Array(0.567636, 0.426266, -1.413687, 0.603592, -1.531267),
@@ -146,8 +144,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
     Seq("Übeض-setosa", "Übeض-setosa")
   )
 
-  type FeatObsClassifier = LinearClassifier[Seq[FeatureObservation[String]]]
-  def testIrisResource(classifier: FeatObsClassifier, resource: String,
+  def testIrisResource(classifier: LinearClassifier, resource: String,
     correctPredicted: Seq[Seq[String]]) {
     val testResource = readDatasetResource(resource)
     val predictions = testResource.map(i => classifier(i.features))
@@ -159,11 +156,11 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
     }
   }
 
-  def testIris(classifier: FeatObsClassifier) =
+  def testIris(classifier: LinearClassifier) =
     testIrisResource(classifier, "/datasets/iris/iris.test.txt",
       irisCorrectPredictedVowpal)
 
-  def testUTFIris(classifier: FeatObsClassifier) =
+  def testUTFIris(classifier: LinearClassifier) =
     testIrisResource(classifier, "/datasets/iris/iris.utf.test.txt",
       irisUTFCorrectPredictedVowpal)
 
@@ -173,11 +170,11 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
       val hashOptions = new HashingOptions(hashtrick = hashtrick)
       if (method == "vowpal") {
         val options = VowpalClassifierOptions(hashOptions)
-        VowpalClassifier.train(trainResource, IdentityFeaturizer,
+        VowpalClassifier.train(trainResource,
           options)
       } else {
         val options = LibLinearClassifierOptions(hashOptions)
-        LibLinearClassifier.train(trainResource, IdentityFeaturizer,
+        LibLinearClassifier.train(trainResource,
           options)
       }
     }
@@ -211,8 +208,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
         val modelFile = tmpFile(s"iris-$method-json-model")
         modelFile.deleteOnExit
         LinearClassifier.writeJSONModel(classifier, modelFile.toString)
-        val cfier2 = LinearClassifier.readJSONModel(modelFile.toString,
-          IdentityFeaturizer)
+        val cfier2 = LinearClassifier.readJSONModel(modelFile.toString)
         testIris(cfier2)
       }
 
@@ -221,8 +217,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
         val modelFile = tmpFile(s"iris-$method-binary-model")
         modelFile.deleteOnExit
         LinearClassifier.writeBinaryModel(classifier, modelFile.toString)
-        val cfier2 = LinearClassifier.readBinaryModel(modelFile.toString,
-          IdentityFeaturizer)
+        val cfier2 = LinearClassifier.readBinaryModel(modelFile.toString)
         testIris(cfier2)
       }
 
@@ -231,8 +226,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
         val modelFile = tmpFile(s"iris-$method-json-model")
         modelFile.deleteOnExit
         LinearClassifier.writeJSONModel(classifier, modelFile.toString)
-        val cfier2 = LinearClassifier.readJSONModel(modelFile.toString,
-          IdentityFeaturizer)
+        val cfier2 = LinearClassifier.readJSONModel(modelFile.toString)
         testUTFIris(cfier2)
       }
 
@@ -241,8 +235,7 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
         val modelFile = tmpFile(s"iris-$method-binary-model")
         modelFile.deleteOnExit
         LinearClassifier.writeBinaryModel(classifier, modelFile.toString)
-        val cfier2 = LinearClassifier.readBinaryModel(modelFile.toString,
-          IdentityFeaturizer)
+        val cfier2 = LinearClassifier.readBinaryModel(modelFile.toString)
         testUTFIris(cfier2)
       }
     }

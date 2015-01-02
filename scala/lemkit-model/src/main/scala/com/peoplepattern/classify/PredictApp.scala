@@ -10,22 +10,20 @@ object PredictApp extends App {
   var readModel: Option[String] = None
   var showCorrect = false
   var showAccuracy = false
-  type FeatObs = FeatureObservation[String]
-  type Examp = Example[String, Seq[FeatObs]]
 
   var i = 0
   val len = args.size
 
   def getarg() = {
     i += 1
-    require(i < len, s"Argument for ${args(i - 1)} required")
+    require(i < len, "Argument for %s required" format args(i - 1))
     args(i)
   }
   def getChoice(choices: Seq[String]) = {
     val value = getarg()
     require(choices.contains(value),
       "Argument for %s must be %s" format (args(i - 1),
-        choices.map(c => s"'$c'").mkString(" or ")))
+        choices.map(c => "'%s'" format c).mkString(" or ")))
     value
   }
 
@@ -67,17 +65,13 @@ object PredictApp extends App {
     }
   }
 
-  object IdentityFeaturizer extends Featurizer[Seq[FeatObs], String] {
-    def apply(input: Seq[FeatObs]) = input
-  }
-
   val classifier =
     readModel match {
       case Some(file) => {
         if (modelFormat == "json")
-          LinearClassifier.readJSONModel(file, IdentityFeaturizer)
+          LinearClassifier.readJSONModel(file)
         else
-          LinearClassifier.readBinaryModel(file, IdentityFeaturizer)
+          LinearClassifier.readBinaryModel(file)
       }
       case None =>
         throw new IllegalArgumentException("Must specify --model (or -m)")

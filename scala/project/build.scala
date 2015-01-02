@@ -3,25 +3,38 @@ import Keys._
 import com.typesafe.sbt.SbtStartScript._
 import sbtrelease.ReleasePlugin._
 import com.typesafe.sbt.SbtScalariform._
-import scoverage.ScoverageSbtPlugin._
-import org.scoverage.coveralls.CoverallsPlugin._
+//import scoverage.ScoverageSbtPlugin._
+//import org.scoverage.coveralls.CoverallsPlugin._
 
 object LemkitBuild extends Build {
 
   import Implicits._
 
-  override val settings = super.settings ++ Seq(
-    organization := "com.peoplepattern",
-    scalacOptions ++= Seq(
+  def scalacOptionsVersion(v: String) = {
+    Seq(
       "-unchecked",
       "-deprecation",
       "-Xlint",
       "-Xfatal-warnings",
       "-Ywarn-dead-code",
-      "-language:_",
-      "-target:jvm-1.7",
-      "-encoding", "UTF-8"),
+      "-encoding", "UTF-8") ++ (
+      CrossVersion.partialVersion(v) match {
+        //case Some((2, scalaMajor)) if scalaMajor == 9 => Nil
+        case Some((2, 9)) => Seq("-target:jvm-1.5")
+        case _ => Seq("-target:jvm-1.7", "-language:_")
+      }
+      //if (v.startsWith("2.9")) Seq() else Seq("-language:_")
+      )
+  }
+
+  override val settings = super.settings ++ Seq(
+    organization := "com.peoplepattern",
+    //scalacOptions ++= scalaVersion(scalacOptionsVersion),
     scalaVersion := "2.10.4",
+    scalacOptions := scalacOptionsVersion(scalaVersion.value),
+    crossScalaVersions := Seq("2.10.4", "2.11.4"),
+    // too hard to get 2.9 working
+    // crossScalaVersions := Seq("2.9.2", "2.10.4", "2.11.4"),
     initialCommands := "import com.peoplepattern.classify"
   )
 
@@ -29,20 +42,27 @@ object LemkitBuild extends Build {
     .aggregate(lemkitModel, lemkitTrain)
     .settings(releaseSettings: _*)
 
+  def scalatestVersion(v: String) = {
+    if (v.startsWith("2.9"))
+      Seq("org.scalatest" %% "scalatest" % "2.0.M5b" % "test")
+    else
+      Seq("org.scalatest" %% "scalatest" % "2.2.3" % "test")
+  }
+
   lazy val lemkitModel = Project(id = "lemkit-model", base = file("lemkit-model"))
     .dependsOnLib(
-      "org.scalatest" %% "scalatest" % "2.2.1" % "test",
       "net.liftweb"   %% "lift-json" % "2.6-RC1")
+    .settings(libraryDependencies <++= scalaVersion(scalatestVersion))
     .settings(scalariformSettings: _*)
-    .settings(instrumentSettings: _*)
-    .settings(coverallsSettings: _*)
+    //.settings(instrumentSettings: _*)
+    //.settings(coverallsSettings: _*)
 
   lazy val lemkitTrain = Project(id = "lemkit-train", base = file("lemkit-train"))
-    .dependsOnLib("org.scalatest" %% "scalatest" % "2.2.1" % "test")
+    .settings(libraryDependencies <++= scalaVersion(scalatestVersion))
     .dependsOn(lemkitModel)
     .settings(scalariformSettings: _*)
-    .settings(instrumentSettings: _*)
-    .settings(coverallsSettings: _*)
+    //.settings(instrumentSettings: _*)
+    //.settings(coverallsSettings: _*)
     .settings(startScriptForClassesSettings: _*)
     .configs(AllTest)
     .configs(VowpalTest)

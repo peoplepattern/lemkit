@@ -14,7 +14,7 @@ object VowpalIndexer extends ClassifierIndexerWriter {
    * Write out the indexed examples to disk in a format that Vowpal can process.
    */
   def writeExamples(
-    examples: TraversableOnce[Example[Int, Seq[FeatureObservation[Int]]]],
+    examples: TraversableOnce[Example[Int, Int]],
     file: File) = {
     var numExamples = 0
     val out = new BufferedWriter(new FileWriter(file))

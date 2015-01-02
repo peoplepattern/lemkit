@@ -48,9 +48,8 @@ object VowpalClassifier extends LinearClassifierTrainer {
    * Train a Vowpal classifier. Currently fixes most of the options to
    * reasonable values for some of our standard use cases.
    */
-  def train[I](
-    trainingExamples: TraversableOnce[Example[String, I]],
-    featurizer: Featurizer[I, String],
+  def train(
+    trainingExamples: TraversableOnce[Example[String, String]],
     options: VowpalClassifierOptions,
     filePrefix: String = "train") = {
 
@@ -76,7 +75,7 @@ object VowpalClassifier extends LinearClassifierTrainer {
 
     // Index and write the training examples in Vowpal format.
     val (indexer, numExamples) =
-      VowpalIndexer.indexAndWriteExamples(trainingExamples, featurizer,
+      VowpalIndexer.indexAndWriteExamples(trainingExamples,
         trainingFile, options.hashingOptions)
 
     val lmap = indexer.lmap
@@ -234,7 +233,7 @@ object VowpalClassifier extends LinearClassifierTrainer {
     // Read the parameters from the file.
     val parameters = readParameters(paramsFile, numClasses, fmapFinal.size)
 
-    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal, featurizer),
+    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal),
       parameters)
   }
 
