@@ -1,10 +1,10 @@
 .PHONY: all
-all: classify predict
+all: classify lemkit-predict
 
 .PHONY: classify
 classify:
 	cd classify; make; cd ..
 
-.PHONY: predict
-commons-predict:
-	cd predict; make; cd ..
+.PHONY: lemkit-predict
+lemkit-predict:
+	cd lemkit-predict; make; cd ..
