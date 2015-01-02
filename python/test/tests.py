@@ -96,8 +96,11 @@ def test_logistic_iris():
 	#print "Evaluating hashed utf"
 	assert predictions == gold_preds_utf, '%s != %s' % (predictions, gold_preds_utf)
 
-
-
+	#print "testing writing of binary model"
+	model = logistic.train(td_utf, hash_trick=False, regularization="L1")
+	model.writeBinary(os.path.join(datadir, 'tmp.bin'))
+	model = lemkit.model_tools.readBinaryModel(os.path.join(datadir, 'tmp.bin'), 1, 1)
+	assert predictions == gold_preds_utf, '%s != %s' % (predictions, gold_preds_utf)
 
 
 

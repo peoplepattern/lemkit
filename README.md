@@ -18,7 +18,7 @@ Build and install lemkit in the desired language. The following versions of the 
 Language      | Version                   | Base Dependencies |
 --------------|---------------------------|-------------------|
 python        |2.7.x                      |setuptools         |
-scala         |2.9+                       |                   |
+scala         |2.10+                      |                   |
 go            |?                          |                   |  
 
 If the language and base dependencies have already been installed it is possible to build lemkit. To build lemkit in python and scala one would execute build.sh as such:
