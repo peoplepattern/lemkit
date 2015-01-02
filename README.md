@@ -30,7 +30,7 @@ Argument      | options                   |
 -l (languages)|scala,python,go (1 or more)|
 
 
-If Lemkit is used only for prediciting using pre-trained linear models then there are no other major dependencies. If Lemkit will be used for training linear models there are potentially a number of other dependencies.
+If Lemkit is used only for prediciting using pre-trained linear models then there are no other dependencies. If Lemkit will be used for training linear models there are potentially a number of other dependencies.
 
 ### Setup Training in Python
 
