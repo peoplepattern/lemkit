@@ -18,14 +18,14 @@ object PredictApp extends App {
 
   def getarg() = {
     i += 1
-    require(i < len, s"Argument for ${args(i - 1)} required")
+    require(i < len, "Argument for %s required" format args(i - 1))
     args(i)
   }
   def getChoice(choices: Seq[String]) = {
     val value = getarg()
     require(choices.contains(value),
       "Argument for %s must be %s" format (args(i - 1),
-        choices.map(c => s"'$c'").mkString(" or ")))
+        choices.map(c => "'%s'" format c).mkString(" or ")))
     value
   }
 

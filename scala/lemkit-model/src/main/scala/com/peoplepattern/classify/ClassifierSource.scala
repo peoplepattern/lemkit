@@ -39,7 +39,7 @@ object ClassifierSource {
         "Should have one vertical bar separating label from features")
       val label_importance = label_feats(0).trim.split("""\s+""")
       require(label_importance.size == 1 || label_importance.size == 2,
-        s"Should have either label alone or label + importance in label portion '${label_feats(0)}'")
+        "Should have either label alone or label + importance in label portion " + label_feats(0))
       val label = label_importance(0)
       val importance =
         if (label_importance.size == 1) None
@@ -48,7 +48,7 @@ object ClassifierSource {
       val features = for (field <- feats) yield {
         val featval = field.split(":")
         require(featval.size == 1 || featval.size == 2,
-          s"Should have at most one colon in field $field")
+          "Should have at most one colon in field " + field)
         if (featval.size == 1) (field, 1.0)
         else (featval(0), featval(1).toDouble)
       }
