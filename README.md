@@ -13,18 +13,48 @@ Begin by cloning the repository and exporting the $LEMKIT environment variable.
 
 ### Build and install lemkit 
 
-Build and install lemkit in the desired language and mode. To build lemkit in Python and Scala for training and predicting execute this command:
+Build and install lemkit in the desired language. The following versions of the three languages are recommended:
 
-    $LEMKIT/build.sh -l python,scala -m train,predict
+Language      | Version                   | Base Dependencies |
+--------------|---------------------------|-------------------|
+python        |2.7.x                      |setuptools         |
+scala         |2.9+                       |                   |
+go            |?                          |                   |  
+
+If the language and base dependencies have already been installed it is possible to build lemkit. To build lemkit in python and scala one would execute build.sh as such:
+
+    $LEMKIT/build.sh -l python,scala
 
 Argument      | options                   |
 --------------|---------------------------|
 -l (languages)|scala,python,go (1 or more)|
--m (modes)    |predict,train (1 or more)  |
 
-Building lemkit with train mode specified creates a number of dependencies. For Python this creates a dependency on Numpy, Scipy, and Scikit-learn. For Scala this creates dependencies on LIBLINEAR and/or Vowpal Wabbit. 
 
-Building lemkit only in predict mode has no dependencies.
+If Lemkit is used only for prediciting using pre-trained linear models then there are no other major dependencies. If Lemkit will be used for training linear models there are potentially a number of other dependencies.
+
+### Setup Training in Python
+
+The python component of lemkit requires Scikit-learn, Scipy, and Numpy for training models. Users are encouraged to utilize their preferred distribution method to install the packages.
+
+Debain/Ubuntu
+
+    sudo apt-get install python-sklearn
+
+Mac OSX
+
+	port install py27-scikit-learn
+
+Or
+
+	pip install -U numpy scipy scikit-learn
+
+### Setup Training in Scala
+
+Scala training has dependencies on LIBLINEAR and/or Vowpal Wabbit.
+
+### Setup Training in Go
+
+ Go currently only supports predicting using pre-trained models, so no other dependencies exist.
 
 ### Running lemkit
 
