@@ -12,6 +12,11 @@ datadir = os.path.join(LEMKIT, 'data')
 def reframe_preds(preds):
 	return [[int(p[0]), unicode(p[1].decode('utf-8')), unicode(p[2].decode('utf-8'))] for p in preds]
 
+def reframe_preds2(preds):
+	return [[int(p[0]), unicode(p[1]), unicode(p[2])] for p in preds]
+
+def reframe_preds3(preds):
+	return [[int(p[0]), p[1].decode('utf-8'), p[2].decode('utf-8')] for p in preds]
 
 def test_logistic_iris():
 
@@ -85,11 +90,12 @@ def test_logistic_iris():
 	tst = os.path.join(datadir, 'iris.test.txt')
 	tst_utf = os.path.join(datadir, 'iris.utf.test.txt')
 	model = logistic.train(td, hash_trick=False, regularization="L1")
-	predictions = model.predict(tst)
+	predictions = reframe_preds(model.predict(tst))
 	#print "Evaluating regular"
+	#print predictions
 	assert predictions == gold_preds, '%s != %s' % (predictions, gold_preds)
 	model = logistic.train(td_utf, hash_trick=False, regularization="L1")
-	predictions = refram_preds(model.predict(tst_utf))
+	predictions = reframe_preds3(model.predict(tst_utf))
 	#print "Evaluating utf"
 	assert predictions == gold_preds_utf, '%s != %s' % (predictions, gold_preds_utf)
 

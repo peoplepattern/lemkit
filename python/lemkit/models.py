@@ -30,7 +30,7 @@ class LinearModel:
 		from lemkit.predict import *
 
 		if self.feature_index is not None:
-			if self.nonzero_indices is not None:
+			if self.nonzero_index is not None:
 				predictions = exact_predict_sparse(self.weight_matrix,
 						    self.label_index,
 						    self.feature_index,

@@ -56,15 +56,15 @@ def extract_vectors(trainfile, hash_trick, hashmod, output_hash, output_hash_fil
 	i, j, y = 0, 0, 0
 	row_indexes, col_indexes, values, labels = [], [], [], []
 
-	feature_index[u"".encode('utf-8')] = 0
+	feature_index[""] = 0
 
 	i += 1
 
-	with io.open(trainfile, 'r', encoding='utf-8') as tf:
+	with io.open(trainfile, 'rb') as tf:
 		for line in tf:
 			if len(line) > 0:
-				label = line.strip().split(u'|')[0].strip()
-				feats = line.strip().split(u'|')[1].strip()
+				label = line.strip().split('|')[0].strip()
+				feats = line.strip().split('|')[1].strip()
 				row_indexes.append(len(values))
 				#Add the intercept constant
 				col_indexes.append(0)
@@ -74,11 +74,11 @@ def extract_vectors(trainfile, hash_trick, hashmod, output_hash, output_hash_fil
 					label_index[label] = y
 					y += 1
 				labels.append(label_index[label])
-				for f in feats.split(u' '):
-					fv = f.split(u':')
+				for f in feats.split(' '):
+					fv = f.split(':')
 					if fv[0] not in feature_index:
 						if hash_trick == True:
-							feature_index[fv[0]] = mh.hash(fv[0].encode('utf-8')) % hashmod
+							feature_index[fv[0]] = mh.hash(fv[0]) % hashmod
 						else:
 							feature_index[fv[0]] = i
 							i += 1
