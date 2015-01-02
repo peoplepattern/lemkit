@@ -2,8 +2,6 @@
 # obtained on
 # http://stackoverflow.com/questions/13305290/is-there-a-pure-python-implementation-of-murmurhash
 
-#import ctypes
-
 # murmur3_x86_32
 
 

@@ -3,6 +3,7 @@ import numpy, scipy
 from scipy.sparse import csr_matrix
 from sklearn import linear_model
 from operator import itemgetter
+from lemkit import models
 
 # attempt to import fast c implementation, if fails go to slow backup
 try:
@@ -42,7 +43,7 @@ def train(train_file, hash_trick=False, regularization="L1",
 	model.fit(X, Y)
 	coefs = model.coef_
 
-	return label_index, feature_index, coefs.tolist()
+	return models.LinearModel(label_index, feature_index, coefs.tolist(), hash_trick=hash_trick, hashmod=hashmod)
 
 
 
