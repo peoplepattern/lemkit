@@ -5,6 +5,7 @@
 
 import os, sys
 import argparse
+from lemkit import model_tools
 
 pa = argparse.ArgumentParser(description='Linear classifier prediction')
 pa.add_argument('-m', '--model', action='store', required=True,
@@ -23,13 +24,10 @@ pa.add_argument('-o', '--outfile', action='store',
 
 args = pa.parse_args()
 
-import lemkit
-
-model = lemkit.models.LinearModel()
 if args.model_format == 'binary':
-	model.readBinary(args.model)
+	model = model_tools.readBinary(args.model, model_majorVersion=1, model_minorVersion=1)
 elif args.model_format == 'json':
-	model.readJson(args.model)
+	model = model_tools.readJson(args.model)
 
 p = model.predict(args.predict, args.outfile)
 
@@ -54,4 +52,3 @@ if args.show_accuracy:
 if args.outfile != None:
 	output.close()
 
-#print "Predictions made, check outfile @", outfile

@@ -65,31 +65,6 @@ class LinearModel:
 
 		return predictions
 
-	def readBinary(self, model_file):
-		from lemkit import model_tools
-
-		weight_matrix, label_index, feature_index, hashmod, nonzero_indices = model_tools.readBinaryModel(model_file, self.majorVersion, self.minorVersion)
-
-		self.label_index = label_index
-		self.feature_index = feature_index
-		self.weight_matrix = weight_matrix
-		self.hashmod = hashmod
-		self.nonzero_indices = nonzero_indices
-		self.model_type = "binary"
-		self.model_file = model_file
-
-	def readJson(self, model_file):
-		from lemkit import model_tools
-
-		weight_matrix, label_index, feature_index, hashmod = model_tools.readJsonModel(model_file)
-
-		self.label_index = label_index
-		self.feature_index = feature_index
-		self.weight_matrix = weight_matrix
-		self.hashmod = hashmod
-		self.model_type = "json"
-		self.model_file = model_file
-
 	def writeBinary(self, model_file, sparse="False"):
 		from lemkit import model_tools
 		model_tools.writeBinaryModel(model_file, self.weight_matrix,

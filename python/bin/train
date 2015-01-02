@@ -5,6 +5,8 @@
 
 import argparse
 import sys
+from lemkit import model_tools
+from lemkit.train import *
 
 pa = argparse.ArgumentParser(description='Linear classifier Wrapper')
 
@@ -29,16 +31,17 @@ pa.add_argument('-s', '--sparse', action='store', default="False",
 
 args = pa.parse_args()
 
-import lemkit
-model = lemkit.models.LinearModel()
-
 if args.hash is None or (args.hash).isdigit() == True:
-	model.train(args.train, args.modelmethod,
-			    args.reg, args.hash, args.hash)
+	if args.modelmethod == 'logistic':
+		print "Begin Training Logistic Model"
+		model = logistic.train(args.train, args.modelmethod,
+							   args.reg, args.hash, args.hash)
 	if args.model_format == 'binary':
 		model.writeBinary(args.outfile, args.sparse)
+		print "Model Written in Binary Format @", args.outfile
 	elif args.model_format == 'json':
 		model.writeJson(args.outfile)
+		print "Model Written in Json Format @", args.outfile
 else:
 	print >> sys.stderr, "ERROR: Problem interpreting --hash argument. It should be an integer."
 	sys.exit()

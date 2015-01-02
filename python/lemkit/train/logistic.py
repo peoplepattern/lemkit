@@ -43,9 +43,7 @@ def train(train_file, hash_trick=False, regularization="L1",
 	model.fit(X, Y)
 	coefs = model.coef_
 
-	#return label_index, feature_index, coefs.tolist()
-
-	models.LinearModel()
+	return models.LinearModel(label_index, feature_index, coefs.tolist(), hash_trick=hash_trick, hashmod=hashmod)
 
 
 
