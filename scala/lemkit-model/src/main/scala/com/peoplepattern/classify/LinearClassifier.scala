@@ -21,13 +21,12 @@ import util.NumNormalizer._
  *   same number of weights per array
  * @param lmap Map from label names to corresponding identifying integers
  * @param fmap Map from feature names to corresponding identifying integers
- * @param featurizer Object to generate features for data instance
  */
 @SerialVersionUID(1)
-class LinearClassifier[I](
-    private val indexer: ClassifierIndexer[I],
-    private val parameters: Array[Array[Double]]) extends FeaturizingClassifier[I](indexer) {
-  def rawEvalFeatures(feats: Seq[FeatureObservation[Int]]): Seq[Double] = {
+class LinearClassifier(
+    private val indexer: ClassifierIndexer,
+    private val parameters: Array[Array[Double]]) extends IndexingClassifier(indexer) {
+  def rawEvalFeatures(feats: FeatureSet[Int]): Seq[Double] = {
     val numClasses = indexer.lmap.size
 
     // Start with zero array
@@ -40,8 +39,8 @@ class LinearClassifier[I](
     scoresLogs.toSeq
   }
 
-  def scores(text: I): Seq[(String, Double)] = {
-    labelIndex zip sumNormalize(exp(evalRaw(text)))
+  def scores(feats: FeatureSet[String]): Seq[(String, Double)] = {
+    labels zip sumNormalize(exp(evalRaw(feats)))
   }
 }
 
@@ -67,14 +66,13 @@ object LinearClassifier {
   val weightsTypeSparse = 2
   val weightsValuesID = 121
 
-  def apply[I](indexer: ClassifierIndexer[I], params: Array[Array[Double]]) =
+  def apply(indexer: ClassifierIndexer, params: Array[Array[Double]]) =
     new LinearClassifier(indexer, params)
 
-  def readJSONModel[I](file: String, featurizer: Featurizer[I, String]) =
-    readJSONModelSource(Source.fromFile(file), featurizer)
+  def readJSONModel(file: String) =
+    readJSONModelSource(Source.fromFile(file))
 
-  def readJSONModelSource[I](source: Source,
-    featurizer: Featurizer[I, String]) = {
+  def readJSONModelSource(source: Source) = {
     val filecontents = source.getLines.toSeq.mkString("\n")
     val json = liftjson.parse(filecontents)
     val jsonfeats = json \ "features"
@@ -99,7 +97,7 @@ object LinearClassifier {
         ???
     }
     val params = weights.map(_.toArray).toArray
-    apply(new ClassifierIndexer(lmap, fmap, featurizer), params)
+    apply(new ClassifierIndexer(lmap, fmap), params)
   }
 
   import java.nio.charset.Charset
@@ -163,16 +161,16 @@ object LinearClassifier {
           value, checked))
   }
 
-  def readBinaryModel[I](file: String, featurizer: Featurizer[I, String]) = {
+  def readBinaryModel(file: String) = {
     val in = new DataInputStream(new BufferedInputStream(new FileInputStream(file)))
     try {
-      readBinaryModelStream(in, featurizer)
+      readBinaryModelStream(in)
     } finally {
       in.close()
     }
   }
 
-  def readBinaryModelStream[I](in: DataInputStream, featurizer: Featurizer[I, String]) = {
+  def readBinaryModelStream(in: DataInputStream) = {
     checkInt(in, magicNumber)
     checkShort(in, majorVersion)
     checkShort(in, minorVersion)
@@ -205,10 +203,10 @@ object LinearClassifier {
       }
       parameters(i) = oneparams
     }
-    apply(new ClassifierIndexer(lmap, fmap, featurizer), parameters)
+    apply(new ClassifierIndexer(lmap, fmap), parameters)
   }
 
-  def writeJSONModel[I](classifier: LinearClassifier[I], file: String) = {
+  def writeJSONModel(classifier: LinearClassifier, file: String) = {
     val features = classifier.indexer.fmap match {
       case f: ExactFeatureMap =>
         ("type" -> "exact") ~ ("features" -> f.fmap)
@@ -230,7 +228,7 @@ object LinearClassifier {
     }
   }
 
-  def writeBinaryModel[I](classifier: LinearClassifier[I], file: String) {
+  def writeBinaryModel(classifier: LinearClassifier, file: String) {
     val out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(file)))
     try {
       writeBinaryModel(classifier, out)
@@ -239,7 +237,7 @@ object LinearClassifier {
     }
   }
 
-  def writeBinaryModel[I](classifier: LinearClassifier[I], out: DataOutputStream) {
+  def writeBinaryModel(classifier: LinearClassifier, out: DataOutputStream) {
     out.writeInt(magicNumber)
     out.writeShort(majorVersion)
     out.writeShort(minorVersion)

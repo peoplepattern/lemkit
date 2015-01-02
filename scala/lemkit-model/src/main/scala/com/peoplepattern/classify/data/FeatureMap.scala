@@ -2,7 +2,6 @@ package com.peoplepattern.classify.data
 
 /**
  * A trait for classes that can index features represented as Strings.
- * Non-general at the moment.
  */
 trait FeatureMap extends Serializable {
   /** Convert a feature string to an index. */

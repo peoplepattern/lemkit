@@ -10,8 +10,6 @@ object PredictApp extends App {
   var readModel: Option[String] = None
   var showCorrect = false
   var showAccuracy = false
-  type FeatObs = FeatureObservation[String]
-  type Examp = Example[String, Seq[FeatObs]]
 
   var i = 0
   val len = args.size
@@ -67,17 +65,13 @@ object PredictApp extends App {
     }
   }
 
-  object IdentityFeaturizer extends Featurizer[Seq[FeatObs], String] {
-    def apply(input: Seq[FeatObs]) = input
-  }
-
   val classifier =
     readModel match {
       case Some(file) => {
         if (modelFormat == "json")
-          LinearClassifier.readJSONModel(file, IdentityFeaturizer)
+          LinearClassifier.readJSONModel(file)
         else
-          LinearClassifier.readBinaryModel(file, IdentityFeaturizer)
+          LinearClassifier.readBinaryModel(file)
       }
       case None =>
         throw new IllegalArgumentException("Must specify --model (or -m)")

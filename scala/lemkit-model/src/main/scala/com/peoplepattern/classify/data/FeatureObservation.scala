@@ -1,4 +1,5 @@
-package com.peoplepattern.classify.data
+package com.peoplepattern.classify
+package data
 
 /**
  * A feature with its observed magnitude in some context. The default is
@@ -52,7 +53,7 @@ object FeatureObservation {
    *  becomes
    *      `Seq[("bar",1.0),("foo",3.0)]`
    */
-  def condense(features: Seq[FeatureObservation[Int]]) =
+  def condense(features: FeatureSet[Int]) =
     features
       .groupBy(_.feature)
       .values

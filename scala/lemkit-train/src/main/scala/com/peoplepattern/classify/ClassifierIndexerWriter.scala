@@ -14,21 +14,20 @@ trait ClassifierIndexerWriter {
    * can process. Return number of examples.
    */
   def writeExamples(
-    examples: TraversableOnce[Example[Int, Seq[FeatureObservation[Int]]]],
+    examples: TraversableOnce[Example[Int, Int]],
     file: File): Int
 
   /**
-   * As examples come through, featurize them, index them, and write them
-   * to a file. Return the indexer based on the label and feature maps that can
+   * As examples come through, index them, and write them to a file.
+   * Return the indexer based on the label and feature maps that can
    * index new examples for classification.
    */
-  def indexAndWriteExamples[I](
-    examples: TraversableOnce[Example[String, I]],
-    featurizer: Featurizer[I, String],
+  def indexAndWriteExamples(
+    examples: TraversableOnce[Example[String, String]],
     file: File,
     hashingOptions: HashingOptions) = {
     val (_, indexer, numExamples) =
-      ClassifierIndexer.index(examples, featurizer,
+      ClassifierIndexer.index(examples,
         ex => ((), writeExamples(ex, file)), hashingOptions)
     (indexer, numExamples)
   }
