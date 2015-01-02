@@ -16,9 +16,10 @@ def writeBinaryModel(filename, weights, feature_index, label_index,
     def write_short(w, int1):
         w.write(pack('>h', int1))
 
+    #Assumes all strings are native utf-8 byte strings. Encodes utf-8 prior to writing binary
     def write_string(w, str1):
-        w.write(pack('>i%ds' % (len(str1.encode('utf-8')),),
-                     len(str1.encode('utf-8')), str1.encode('utf-8')))
+        w.write(pack('>i%ds' % (len(str1.decode('utf-8').encode('utf-8')),),
+                     len(str1.decode('utf-8').encode('utf-8')), str1.decode('utf-8').encode('utf-8')))
 
     def write_double(w, dub1):
         w.write(pack('>d', dub1))
@@ -272,4 +273,4 @@ def readBinaryModel(filename, model_majorVersion, model_minorVersion):
         hash_trick = True
     else:
         hash_trick = False
-    return models.LinearModel(label_index, feature_index, weights, nonzero_index=nonzero_index, hash_trick=hash_trick, hashmod=hashmod)
+    return models.LinearModel(label_index, feature_index, weights, nonzero_index=nonzero_indices, hash_trick=hash_trick, hashmod=hashmod)
