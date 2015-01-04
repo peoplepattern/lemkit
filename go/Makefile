@@ -6,5 +6,5 @@ classify:
 	cd classify; make; cd ..
 
 .PHONY: lkpredict
-commons-predict:
+lkpredict:
 	cd lkpredict; make; cd ..

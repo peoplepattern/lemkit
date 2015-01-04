@@ -20,7 +20,8 @@ printf "LEMKIT environment variable set to $LEMKIT \n"
 case "$lang" in
   *scala*)
    printf "Building in Scala \n"
-   # code when lang has scala
+   sbt update
+   sbt stage
   ;;
 esac
 
@@ -33,4 +34,4 @@ case "$lang" in
 	 cd $LEMKIT
 	;;
 esac
-		
+
