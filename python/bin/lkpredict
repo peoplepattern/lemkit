@@ -1,0 +1,54 @@
+#!/usr/bin/env python2.7
+
+#This bin file provides an easy, command-line interface for predicting
+#example: commons-predict -m /path/to/trained_model.model -p /path/to/test_on_this.txt -o /path/to/outfile.txt
+
+import os, sys
+import argparse
+from lemkit import model_tools
+
+pa = argparse.ArgumentParser(description='Linear classifier prediction')
+pa.add_argument('-m', '--model', action='store', required=True,
+	help="Trained model file")
+pa.add_argument('-p', '--predict', action='store', required=True,
+	help="File containing data instances to predict")
+pa.add_argument('-f', '--model-format', '--mf', action='store',
+	default='binary', choices=['json', 'binary'],
+	help="Model format (json or binary, default binary)")
+pa.add_argument('-a', '--show-accuracy', action='store_true',
+	help="Output accuracy at end")
+pa.add_argument('-c', '--show-correct', action='store_true',
+	help="Output column indicating correct or wrong")
+pa.add_argument('-o', '--outfile', action='store',
+	help="File predictions will be written to instead of stdout")
+
+args = pa.parse_args()
+
+if args.model_format == 'binary':
+	model = model_tools.readBinary(args.model, model_majorVersion=1, model_minorVersion=1)
+elif args.model_format == 'json':
+	model = model_tools.readJson(args.model)
+
+p = model.predict(args.predict, args.outfile)
+
+if args.outfile == None:
+	output = sys.stdout
+else:
+	output = open(args.outfile, "w")
+
+correct = 0
+total = 0
+for row in p:
+	total += 1
+	if row[1] == row[2]:
+		correct += 1
+	if args.show_correct:
+		print >>output, row[0], row[1] == row[2] and "CORRECT" or "WRONG", \
+			row[1], row[2]
+	else:
+		print >>output, row[0], row[1], row[2]
+if args.show_accuracy:
+	print >>output, "Accuracy: %.2f%%" % (float(correct) * 100 / total)
+if args.outfile != None:
+	output.close()
+
