@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/peoplepattern/commons-go/classify"
+	"github.com/peoplepattern/lemkit/go/classify"
 	"os"
 )
 
