@@ -79,10 +79,12 @@ def test_logistic_iris():
 
 	gold_preds_utf = [[r[0], r[1], r[2]] for r in gold_preds_utf]
 
-	td = os.path.join(datadir, 'iris.train.txt')
-	td_utf = os.path.join(datadir, 'iris.utf.train.txt')
-	tst = os.path.join(datadir, 'iris.test.txt')
-	tst_utf = os.path.join(datadir, 'iris.utf.test.txt')
+	irisdir = os.path.join(datadir, 'iris')
+
+	td = os.path.join(irisdir, 'iris.train.txt')
+	td_utf = os.path.join(irisdir, 'iris.utf.train.txt')
+	tst = os.path.join(irisdir, 'iris.test.txt')
+	tst_utf = os.path.join(irisdir, 'iris.utf.test.txt')
 	model = logistic.train(td, hash_trick=False, regularization="L1")
 	predictions = reframe_preds3(model.predict(tst))
 	#print "Evaluating regular"
