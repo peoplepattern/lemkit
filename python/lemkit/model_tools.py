@@ -154,7 +154,7 @@ def writeJsonModel(model_file, coefs, label_index, feature_index, hash_trick, ha
 
 
 def readJsonModel(filename):
-    with open(model, 'r') as r:
+    with open(filename, 'r') as r:
         model_json = json.load(r)
         if model_json['features']['type'] == 'exact':
             weight_matrix = model_json['weights']['values']

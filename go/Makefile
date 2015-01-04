@@ -1,10 +1,10 @@
 .PHONY: all
-all: classify predict
+all: classify lkpredict
 
 .PHONY: classify
 classify:
 	cd classify; make; cd ..
 
-.PHONY: predict
+.PHONY: lkpredict
 commons-predict:
-	cd predict; make; cd ..
+	cd lkpredict; make; cd ..

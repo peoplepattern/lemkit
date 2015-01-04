@@ -25,9 +25,9 @@ pa.add_argument('-o', '--outfile', action='store',
 args = pa.parse_args()
 
 if args.model_format == 'binary':
-	model = model_tools.readBinary(args.model, model_majorVersion=1, model_minorVersion=1)
+	model = model_tools.readBinaryModel(args.model, model_majorVersion=1, model_minorVersion=1)
 elif args.model_format == 'json':
-	model = model_tools.readJson(args.model)
+	model = model_tools.readJsonModel(args.model)
 
 p = model.predict(args.predict, args.outfile)
 
