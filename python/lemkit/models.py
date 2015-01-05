@@ -60,7 +60,7 @@ class LinearModel:
         if outfile is not None:
             with io.open(outfile, 'w', encoding='utf-8') as w:
                 for p in predictions:
-                    w.write(u' '.join(p[:-1]) + '\n')
+                    w.write(u'|'.join(p[:-1]) + '\n')
             print "Writing predictions complete check them @ ", outfile
 
         return predictions

@@ -175,7 +175,7 @@ def readJsonModel(filename):
     return models.LinearModel(label_index, feature_index, weight_matrix, hash_trick=hash_trick, hashmod=hashmod)
 
 
-def readBinaryModel(filename, model_majorVersion, model_minorVersion):
+def readBinaryModel(filename, model_majorVersion=1, model_minorVersion=1):
     from struct import unpack
 
     def read_int(r):

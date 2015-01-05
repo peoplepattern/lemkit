@@ -19,10 +19,8 @@ except:
 # label | feature:value feature:value feature:value
 #
 
-# trainfile = file path with format specified above
-#regularizaiton = L1 or L2
-# model_file = file name where trained model will be written to
-#save_mode = "json" or "binary"
+# train_file = file path with format specified above
+# regularizaiton = L1 or L2
 # hash_trick = True or False. If true it will use murmurhash3 and the hashing trick
 #	to map strings to features. If false it will create a sequential mapping of features
 #	from 1 to N where N = number of features
