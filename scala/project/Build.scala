@@ -28,20 +28,13 @@ object LemkitBuild extends Build {
     organization := "com.peoplepattern",
     scalaVersion := "2.11.5",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    crossScalaVersions := Seq("2.10.4", "2.11.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.5"),
     initialCommands := "import com.peoplepattern.classify"
   )
 
   lazy val root = Project(id = "lemkit", base = file("."))
     .aggregate(lemkitModel, lemkitTrain)
     .settings(releaseSettings: _*)
-
-  def scalatestVersion(v: String) = {
-    if (v.startsWith("2.9"))
-      Seq("org.scalatest" %% "scalatest" % "2.0.M5b" % "test")
-    else
-      Seq("org.scalatest" %% "scalatest" % "2.2.3" % "test")
-  }
 
   lazy val lemkitModel = Project(id = "lemkit-model", base = file("lemkit-model"))
     .dependsOnLib("net.liftweb" %% "lift-json" % "2.6-RC1")
