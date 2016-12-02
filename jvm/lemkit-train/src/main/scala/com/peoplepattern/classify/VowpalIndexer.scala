@@ -13,9 +13,7 @@ object VowpalIndexer extends ClassifierIndexerWriter {
   /**
    * Write out the indexed examples to disk in a format that Vowpal can process.
    */
-  def writeExamples(
-    examples: TraversableOnce[Example[Int, Int]],
-    file: File) = {
+  def writeExamples(examples: TraversableOnce[Example[Int, Int]], file: File) = {
     var numExamples = 0
     val out = new BufferedWriter(new FileWriter(file))
     try {
@@ -32,8 +30,9 @@ object VowpalIndexer extends ClassifierIndexerWriter {
         val label = (ex.label + 1).toString
         val label_importance =
           label + ex.importance.map(" " + _.toString).getOrElse("")
-        out.write(label_importance + " | " + featureStrings.mkString(" ") +
-          "\n")
+        out.write(
+          label_importance + " | " + featureStrings.mkString(" ") +
+            "\n")
       }
     } finally {
       out.close()
@@ -45,7 +44,9 @@ object VowpalIndexer extends ClassifierIndexerWriter {
    * Given a feature mask (e.g. one learned by using L1 feature selection),
    * transform a file with the original indexation into the new one.
    */
-  def maskFeatures(fmask: Map[Int, Int], originalFile: File, maskedFile: File) {
+  def maskFeatures(fmask: Map[Int, Int],
+    originalFile: File,
+    maskedFile: File) {
     val maskedWriter = new BufferedWriter(new FileWriter(maskedFile))
     try {
       for {

@@ -9,10 +9,12 @@ import org.scalatest._
 import data._
 
 abstract class ClassifierBase(method: String) extends FlatSpec {
+
   /**
    * Create a temporary file, with reasonable defaults for suffix and base dir.
    */
-  def tmpFile(prefix: String, suffix: String = ".txt",
+  def tmpFile(prefix: String,
+    suffix: String = ".txt",
     baseDir: String = "/tmp") =
     File.createTempFile(prefix, suffix, new File(baseDir))
 
@@ -144,24 +146,25 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
     Seq("Übeض-setosa", "Übeض-setosa")
   )
 
-  def testIrisResource(classifier: LinearClassifier, resource: String,
+  def testIrisResource(classifier: LinearClassifier,
+    resource: String,
     correctPredicted: Seq[Seq[String]]) {
     val testResource = readDatasetResource(resource)
     val predictions = testResource.map(i => classifier(i.features))
-    for (
-      ((prediction, inst), Seq(shouldCorrect, shouldPredicted)) <- (predictions zip testResource) zip correctPredicted
-    ) {
+    for (((prediction, inst), Seq(shouldCorrect, shouldPredicted)) <- (predictions zip testResource) zip correctPredicted) {
       assert(shouldCorrect == inst.label)
       assert(shouldPredicted == prediction)
     }
   }
 
   def testIris(classifier: LinearClassifier) =
-    testIrisResource(classifier, "/datasets/iris/iris.test.txt",
+    testIrisResource(classifier,
+      "/datasets/iris/iris.test.txt",
       irisCorrectPredictedVowpal)
 
   def testUTFIris(classifier: LinearClassifier) =
-    testIrisResource(classifier, "/datasets/iris/iris.utf.test.txt",
+    testIrisResource(classifier,
+      "/datasets/iris/iris.utf.test.txt",
       irisUTFCorrectPredictedVowpal)
 
   class Runner(hashtrick: Option[Int]) {
@@ -170,12 +173,10 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
       val hashOptions = new HashingOptions(hashtrick = hashtrick)
       if (method == "vowpal") {
         val options = VowpalClassifierOptions(hashOptions)
-        VowpalClassifier.train(trainResource,
-          options)
+        VowpalClassifier.train(trainResource, options)
       } else {
         val options = LibLinearClassifierOptions(hashOptions)
-        LibLinearClassifier.train(trainResource,
-          options)
+        LibLinearClassifier.train(trainResource, options)
       }
     }
 
@@ -250,12 +251,10 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
 }
 
 // Run this with 'sbt vowpal:test' or 'sbt all:test'
-class RunVowpalSpec extends ClassifierBase("vowpal") {
-}
+class RunVowpalSpec extends ClassifierBase("vowpal") {}
 
 // Run this with 'sbt liblinear:test' or 'sbt all:test'
-class RunLibLinearSpec extends ClassifierBase("liblinear") {
-}
+class RunLibLinearSpec extends ClassifierBase("liblinear") {}
 
 // Run this with 'sbt test' or 'sbt all:test'
 class RunMockSpec extends ClassifierBase("mock") {
@@ -270,7 +269,8 @@ class RunMockSpec extends ClassifierBase("mock") {
   }
 
   it should "read an existing hashed binary model" in {
-    val cfier = readBinaryModelResource("/datasets/iris/iris.vw.hashed.model.bin")
+    val cfier =
+      readBinaryModelResource("/datasets/iris/iris.vw.hashed.model.bin")
     testIris(cfier)
   }
 
@@ -285,7 +285,8 @@ class RunMockSpec extends ClassifierBase("mock") {
   }
 
   it should "read an existing UTF-8 hashed binary model" in {
-    val cfier = readBinaryModelResource("/datasets/iris/iris.vw.hashed.model.utf.bin")
+    val cfier =
+      readBinaryModelResource("/datasets/iris/iris.vw.hashed.model.utf.bin")
     testUTFIris(cfier)
   }
 }

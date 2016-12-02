@@ -14,11 +14,11 @@ package com.peoplepattern.classify.data
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
  limitations under the License.
-*/
+ */
 
 /**
- * A trait for classes that indexes labels and get labels of indexes.
- */
+  * A trait for classes that indexes labels and get labels of indexes.
+  */
 trait LabelMap[L] extends Serializable {
   def indexOfLabel(label: L): Int
   def labelOfIndex(index: Int): L

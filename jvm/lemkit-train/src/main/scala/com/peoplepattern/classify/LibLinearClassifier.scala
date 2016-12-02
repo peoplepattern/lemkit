@@ -19,8 +19,7 @@ import scala.io.Source
  *
  *   extraOptions: Additional options to pass to the underlying classifier.
  */
-case class LibLinearClassifierOptions(
-  hashingOptions: HashingOptions,
+case class LibLinearClassifierOptions(hashingOptions: HashingOptions,
   var regularization: Double = 1.0,
   var verbose: Boolean = false,
   var defaultOptions: String = "-s 7",
@@ -40,8 +39,7 @@ object LibLinearClassifier extends LinearClassifierTrainer {
    * Train a LIBLINEAR classifier. Currently fixes most of the options to
    * reasonable values for some of our standard use cases.
    */
-  def train(
-    trainingExamples: TraversableOnce[Example[String, String]],
+  def train(trainingExamples: TraversableOnce[Example[String, String]],
     options: LibLinearClassifierOptions,
     filePrefix: String = "train") = {
 
@@ -58,7 +56,8 @@ object LibLinearClassifier extends LinearClassifierTrainer {
     // Index and write the training examples in LIBLINEAR format.
     val (indexer, numExamples) =
       LibLinearIndexer.indexAndWriteExamples(trainingExamples,
-        trainingFile, options.hashingOptions)
+        trainingFile,
+        options.hashingOptions)
 
     val lmap = indexer.lmap
     val fmap = indexer.fmap
@@ -79,7 +78,8 @@ object LibLinearClassifier extends LinearClassifierTrainer {
     }
 
     // Train the final model with L2 regularization.
-    val trainCommand = s"train -c ${options.regularization} ${options.defaultOptions} ${options.extraOptions} $trainingFile $modelFile"
+    val trainCommand =
+      s"train -c ${options.regularization} ${options.defaultOptions} ${options.extraOptions} $trainingFile $modelFile"
 
     if (options.verbose)
       println("\nLIBLINEAR training command:\n\n" + trainCommand + "\n")
@@ -88,8 +88,7 @@ object LibLinearClassifier extends LinearClassifierTrainer {
     // Read the parameters from the file.
     val parameters = readParameters(modelFile, numClasses, fmapFinal.size)
 
-    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal),
-      parameters)
+    new LinearClassifier(new ClassifierIndexer(lmap, fmapFinal), parameters)
   }
 
   /**

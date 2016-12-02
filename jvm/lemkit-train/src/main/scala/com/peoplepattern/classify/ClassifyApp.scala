@@ -89,8 +89,9 @@ object ClassifyApp extends App {
         case _ => {
           // If we took positional arguments, we would eliminate the
           // error here and process them down below
-          require(false, "Unrecognized arguments: %s" format
-            args.slice(i, len).mkString(" "))
+          require(false,
+            "Unrecognized arguments: %s" format
+              args.slice(i, len).mkString(" "))
           break
         }
       }
@@ -161,14 +162,14 @@ object ClassifyApp extends App {
       val predictions = predictData.map(i => classifier(i.features))
       val numinsts = predictData.size
       var numcorrect = 0
-      for (
-        ((prediction, inst), index) <- (predictions zip predictData).zipWithIndex
-      ) {
+      for (((prediction, inst), index) <- (predictions zip predictData).zipWithIndex) {
         val correct = inst.label
         val isCorrect = correct == prediction
-        println("%s: %s, correct=%s, predicted=%s" format (
-          index + 1, if (isCorrect) "CORRECT" else "WRONG",
-          correct, prediction))
+        println(
+          "%s: %s, correct=%s, predicted=%s" format (index + 1, if (isCorrect)
+            "CORRECT"
+          else "WRONG",
+            correct, prediction))
         if (isCorrect)
           numcorrect += 1
       }

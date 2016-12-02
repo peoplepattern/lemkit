@@ -22,8 +22,8 @@ object PredictApp extends App {
   def getChoice(choices: Seq[String]) = {
     val value = getarg()
     require(choices.contains(value),
-      "Argument for %s must be %s" format (args(i - 1),
-        choices.map(c => "'%s'" format c).mkString(" or ")))
+            "Argument for %s must be %s" format (args(i - 1),
+            choices.map(c => "'%s'" format c).mkString(" or ")))
     value
   }
 
@@ -46,7 +46,8 @@ object PredictApp extends App {
           showCorrect = true
         }
         case "--help" | "-h" => {
-          println("""Usage:
+          println(
+            """Usage:
 
     --model-format | --mf | -f  Model format (json or binary, default binary)
     --predict | -p              File containing data instances to predict
@@ -57,8 +58,9 @@ object PredictApp extends App {
         case _ => {
           // If we took positional arguments, we would eliminate the
           // error here and process them down below
-          throw new IllegalArgumentException("Unrecognized arguments: %s" format
-            args.slice(i, len).mkString(" "))
+          throw new IllegalArgumentException(
+            "Unrecognized arguments: %s" format
+              args.slice(i, len).mkString(" "))
         }
       }
       i += 1
@@ -83,20 +85,19 @@ object PredictApp extends App {
       val predictions = predictData.map(i => classifier(i.features))
       val numinsts = predictData.size
       var numcorrect = 0
-      for (
-        ((prediction, inst), index) <- (predictions zip predictData).zipWithIndex
-      ) {
+      for (((prediction, inst), index) <- (predictions zip predictData).zipWithIndex) {
         val correct = inst.label
         val isCorrect = correct == prediction
-        println("%s%s %s %s" format (
-          index + 1,
+        println(
+          "%s%s %s %s" format (index + 1,
           if (!showCorrect) "" else if (isCorrect) " CORRECT" else " WRONG",
           correct, prediction))
         if (isCorrect)
           numcorrect += 1
       }
       if (showAccuracy)
-        println("Accuracy: %.2f%%" format (numcorrect.toDouble * 100 / numinsts))
+        println(
+          "Accuracy: %.2f%%" format (numcorrect.toDouble * 100 / numinsts))
     }
     case None =>
       throw new IllegalArgumentException("Must specify --test (or -t)")
