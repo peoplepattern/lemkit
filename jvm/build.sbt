@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
     "-encoding",
     "UTF-8"
   )
-)
+) ++ scalariformSettings
 
 lazy val lkModel = project
   .in(file("lemkit-model"))
@@ -45,7 +45,6 @@ def allFilter(name: String): Boolean = name endsWith "Spec"
 lazy val lkTrain = project
   .in(file("lemkit-train"))
   .settings(commonSettings: _*)
-  .settings(scalariformSettings: _*)
   .settings(startScriptForClassesSettings: _*)
   .settings(
     name := "lemkit-train",

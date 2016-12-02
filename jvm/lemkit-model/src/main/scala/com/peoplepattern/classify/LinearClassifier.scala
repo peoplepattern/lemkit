@@ -5,26 +5,26 @@ import scala.collection.mutable
 
 import java.io._
 
-import net.liftweb.{json => liftjson}
+import net.liftweb.{ json => liftjson }
 import net.liftweb.json.JsonDSL._
 
 import data._
 import util.NumNormalizer._
 
 /**
-  * A Scala-usable version of a linear classifier.
-  *
-  * FIXME: Generalize label type
-  *
-  * @tparam I type of data instance
-  * @param parameters Array of weight arrays, one per label; should have
-  *   same number of weights per array
-  * @param lmap Map from label names to corresponding identifying integers
-  * @param fmap Map from feature names to corresponding identifying integers
-  */
+ * A Scala-usable version of a linear classifier.
+ *
+ * FIXME: Generalize label type
+ *
+ * @tparam I type of data instance
+ * @param parameters Array of weight arrays, one per label; should have
+ *   same number of weights per array
+ * @param lmap Map from label names to corresponding identifying integers
+ * @param fmap Map from feature names to corresponding identifying integers
+ */
 @SerialVersionUID(1)
 class LinearClassifier(private val indexer: ClassifierIndexer,
-                       private val parameters: Array[Array[Double]])
+  private val parameters: Array[Array[Double]])
     extends IndexingClassifier(indexer) {
   def rawEvalFeatures(feats: FeatureSet[Int]): Seq[Double] = {
     val numClasses = indexer.lmap.size
@@ -47,8 +47,8 @@ class LinearClassifier(private val indexer: ClassifierIndexer,
 class InvalidFormatException(msg: String) extends Exception(msg)
 
 /**
-  * General utilities for dealing with linear classifiers.
-  */
+ * General utilities for dealing with linear classifiers.
+ */
 object LinearClassifier {
   val magicNumber = 0x6A48B9DD
   val majorVersion = 1

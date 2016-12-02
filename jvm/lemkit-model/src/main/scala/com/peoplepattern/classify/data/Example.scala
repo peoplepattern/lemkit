@@ -2,13 +2,13 @@ package com.peoplepattern.classify
 package data
 
 /**
-  * A single data instance, consisting of a label and collection of features
-  * (also an optional importance weight and a string ID, which is mostly for
-  * debugging purposes). To create such an object, use the companion object.
-  *
-  * @tparam T type of features
-  * @tparam L type of label
-  */
+ * A single data instance, consisting of a label and collection of features
+ * (also an optional importance weight and a string ID, which is mostly for
+ * debugging purposes). To create such an object, use the companion object.
+ *
+ * @tparam T type of features
+ * @tparam L type of label
+ */
 trait Example[T, +L] extends Serializable { outer =>
   def features: FeatureSet[T]
   def label: L
@@ -16,9 +16,9 @@ trait Example[T, +L] extends Serializable { outer =>
   def importance: Option[Double] = None
 
   /**
-    * Converts the features in this example to a different one while still
-    * preserving label and id.
-    */
+   * Converts the features in this example to a different one while still
+   * preserving label and id.
+   */
   def map[U](f: FeatureSet[T] => FeatureSet[U]): Example[U, L] =
     new Example[U, L] {
       val features = f(outer.features)
@@ -28,9 +28,9 @@ trait Example[T, +L] extends Serializable { outer =>
     }
 
   /**
-    * Converts the label in this example to a different one while still
-    * preserving features and id.
-    */
+   * Converts the label in this example to a different one while still
+   * preserving features and id.
+   */
   def relabel[L2](f: L => L2): Example[T, L2] = new Example[T, L2] {
     val features = outer.features
     val label = f(outer.label)
@@ -39,9 +39,9 @@ trait Example[T, +L] extends Serializable { outer =>
   }
 
   /**
-    * Converts the features in this example to a different one while still
-    * preserving label and id.
-    */
+   * Converts the features in this example to a different one while still
+   * preserving label and id.
+   */
   def flatMap[U](f: FeatureSet[T] => FeatureSet[U]) = map(f)
 
   override def toString = {
@@ -50,19 +50,19 @@ trait Example[T, +L] extends Serializable { outer =>
 }
 
 /**
-  * Companion object for creating objects of type `Example`.
-  * Also contains `lift`, which converts a function that applies to
-  * a feature collection into a function that applies to `Example` objects.
-  */
+ * Companion object for creating objects of type `Example`.
+ * Also contains `lift`, which converts a function that applies to
+ * a feature collection into a function that applies to `Example` objects.
+ */
 object Example {
 
   /**
-    * Create a new Example.
-    */
+   * Create a new Example.
+   */
   def apply[T, L](features: FeatureSet[T],
-                  label: L,
-                  id: String = "",
-                  importance: Option[Double] = None): Example[T, L] = {
+    label: L,
+    id: String = "",
+    importance: Option[Double] = None): Example[T, L] = {
     val f = features
     val l = label
     val i = id
@@ -76,9 +76,9 @@ object Example {
   }
 
   /**
-    * Lifts a function to operate over Examples,
-    * rather than the contained object.
-    */
+   * Lifts a function to operate over Examples,
+   * rather than the contained object.
+   */
   def lift[T, U, L](f: FeatureSet[T] => FeatureSet[U]) =
     (o: Example[T, L]) => o.map(f)
 }

@@ -22,8 +22,8 @@ object PredictApp extends App {
   def getChoice(choices: Seq[String]) = {
     val value = getarg()
     require(choices.contains(value),
-            "Argument for %s must be %s" format (args(i - 1),
-            choices.map(c => "'%s'" format c).mkString(" or ")))
+      "Argument for %s must be %s" format (args(i - 1),
+        choices.map(c => "'%s'" format c).mkString(" or ")))
     value
   }
 
@@ -90,8 +90,8 @@ object PredictApp extends App {
         val isCorrect = correct == prediction
         println(
           "%s%s %s %s" format (index + 1,
-          if (!showCorrect) "" else if (isCorrect) " CORRECT" else " WRONG",
-          correct, prediction))
+            if (!showCorrect) "" else if (isCorrect) " CORRECT" else " WRONG",
+            correct, prediction))
         if (isCorrect)
           numcorrect += 1
       }

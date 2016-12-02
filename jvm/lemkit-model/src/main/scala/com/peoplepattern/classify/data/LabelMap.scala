@@ -17,8 +17,8 @@ package com.peoplepattern.classify.data
  */
 
 /**
-  * A trait for classes that indexes labels and get labels of indexes.
-  */
+ * A trait for classes that indexes labels and get labels of indexes.
+ */
 trait LabelMap[L] extends Serializable {
   def indexOfLabel(label: L): Int
   def labelOfIndex(index: Int): L
