@@ -19,22 +19,16 @@ object LemkitBuild extends Build {
       "-Ywarn-dead-code",
       "-encoding", "UTF-8") ++ (
       CrossVersion.partialVersion(v) match {
-        //case Some((2, scalaMajor)) if scalaMajor == 9 => Nil
         case Some((2, 9)) => Seq("-target:jvm-1.5")
         case _ => Seq("-target:jvm-1.7", "-language:_")
-      }
-      //if (v.startsWith("2.9")) Seq() else Seq("-language:_")
-      )
+      })
   }
 
   override val settings = super.settings ++ Seq(
     organization := "com.peoplepattern",
-    //scalacOptions ++= scalaVersion(scalacOptionsVersion),
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.11.5",
     scalacOptions := scalacOptionsVersion(scalaVersion.value),
-    crossScalaVersions := Seq("2.10.4", "2.11.4"),
-    // too hard to get 2.9 working
-    // crossScalaVersions := Seq("2.9.2", "2.10.4", "2.11.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.5"),
     initialCommands := "import com.peoplepattern.classify"
   )
 
@@ -42,28 +36,15 @@ object LemkitBuild extends Build {
     .aggregate(lemkitModel, lemkitTrain)
     .settings(releaseSettings: _*)
 
-  def scalatestVersion(v: String) = {
-    if (v.startsWith("2.9"))
-      Seq("org.scalatest" %% "scalatest" % "2.0.M5b" % "test")
-    else
-      Seq("org.scalatest" %% "scalatest" % "2.2.3" % "test")
-  }
-
   lazy val lemkitModel = Project(id = "lemkit-model", base = file("lemkit-model"))
-    .dependsOnLib(
-      "net.liftweb"   %% "lift-json" % "2.6-RC1")
-    .settings(libraryDependencies <++= scalaVersion(scalatestVersion))
+    .dependsOnLib("net.liftweb" %% "lift-json" % "2.6-RC1")
+    .dependsOnLib("org.scalatest" %% "scalatest" % "2.2.4" % "test")
     .settings(scalariformSettings: _*)
-    //.settings(instrumentSettings: _*)
-    //.settings(coverallsSettings: _*)
-    .settings(startScriptForClassesSettings: _*)
 
   lazy val lemkitTrain = Project(id = "lemkit-train", base = file("lemkit-train"))
-    .settings(libraryDependencies <++= scalaVersion(scalatestVersion))
     .dependsOn(lemkitModel)
+    .dependsOnLib("org.scalatest" %% "scalatest" % "2.2.4" % "test")
     .settings(scalariformSettings: _*)
-    //.settings(instrumentSettings: _*)
-    //.settings(coverallsSettings: _*)
     .settings(startScriptForClassesSettings: _*)
     .configs(AllTest)
     .configs(VowpalTest)
