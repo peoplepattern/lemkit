@@ -1,6 +1,7 @@
 // LEMKIT JVM
 
-import com.typesafe.sbt.SbtStartScript._
+import com.typesafe.sbt.SbtNativePackager._
+import NativePackagerKeys._
 
 lazy val commonSettings = Seq(
   organization := "com.peoplepattern",
@@ -22,8 +23,6 @@ lazy val commonSettings = Seq(
 
 lazy val lkModel = project
   .in(file("lemkit-model"))
-  .settings(commonSettings: _*)
-  .settings(startScriptForClassesSettings: _*)
   .settings(
     name := "lemkit-model",
     libraryDependencies ++= Seq(
@@ -31,6 +30,8 @@ lazy val lkModel = project
       "org.scalatest" %% "scalatest" % "2.2.4" % "test"
     )
   )
+  .settings(commonSettings: _*)
+  .settings(packageArchetype.java_application)
 
 lazy val AllTest = config("all") extend (Test)
 lazy val VowpalTest = config("vowpal") extend (Test)
@@ -44,14 +45,13 @@ def allFilter(name: String): Boolean = name endsWith "Spec"
 
 lazy val lkTrain = project
   .in(file("lemkit-train"))
-  .settings(commonSettings: _*)
-  .settings(startScriptForClassesSettings: _*)
   .settings(
     name := "lemkit-train",
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "2.2.4" % "test"
     )
   )
+  .settings(commonSettings: _*)
   .configs(AllTest)
   .configs(VowpalTest)
   .configs(LibLinearTest)
@@ -62,7 +62,7 @@ lazy val lkTrain = project
             testOptions in AllTest := Seq(Tests.Filter(allFilter)),
             testOptions in VowpalTest := Seq(Tests.Filter(vowpalFilter)),
             testOptions in LibLinearTest := Seq(Tests.Filter(libLinearFilter)))
-  .settings(startScriptForClassesSettings: _*)
+  .settings(packageArchetype.java_application)
   .dependsOn(lkModel)
 
 lazy val root = project
