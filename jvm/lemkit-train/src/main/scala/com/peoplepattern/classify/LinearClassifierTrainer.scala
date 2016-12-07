@@ -4,6 +4,12 @@ import data._
 
 trait LinearClassifierTrainer {
 
+  def train(trainingExamples: TraversableOnce[Example[String, String]]): Classifier
+
+}
+
+object LinearClassifierTrainer {
+
   /**
    * Create a temporary file, with reasonable defaults for suffix and base dir.
    */

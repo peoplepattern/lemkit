@@ -3,54 +3,57 @@ package com.peoplepattern.classify
 import data._
 import scala.io.Source
 
-/**
- * The options for Vowpal classifier learning.
- *
- *   hashingOptions: Options for feature hashing.
- *
- *   regularization: The value for L2 regularization.
- *
- *   verbose: Useful for debugging. If true, don't delete tmp files when
- *      program exits, don't suppress verbose output from Vowpal, and output
- *      various status messages.
- *
- *   featureSelectionMultiple: Perform L1 feature selection. The Int value
- *      provided indicates the multiple of the number of training instances
- *      to use as a cutoff. For example, if there are 10,000 training
- *      instances and the multiple is 3, then we will try to find about
- *      30,000 features. The final model is then computed with L2
- *      regularization with those reduced features.
- *
- *   defaultOptions: Default options passed to the underlying Vowpal
- *      Wabbit classifier.
- *
- *   extraOptions: Additional options to pass to the underlying classifier.
- */
-case class VowpalClassifierOptions(
-  hashingOptions: HashingOptions,
-  var regularization: Double = 1.0,
-  var verbose: Boolean = false,
-  var featureSelectionMultiple: Option[Int] = None,
-  var defaultOptions: String = "--bfgs --passes 100 --loss_function logistic --holdout_off",
-  var extraOptions: String = "")
+object VowpalTrainer {
+  /**
+   * The options for Vowpal classifier learning.
+   *
+   *   hashingOptions: Options for feature hashing.
+   *
+   *   regularization: The value for L2 regularization.
+   *
+   *   verbose: Useful for debugging. If true, don't delete tmp files when
+   *      program exits, don't suppress verbose output from Vowpal, and output
+   *      various status messages.
+   *
+   *   featureSelectionMultiple: Perform L1 feature selection. The Int value
+   *      provided indicates the multiple of the number of training instances
+   *      to use as a cutoff. For example, if there are 10,000 training
+   *      instances and the multiple is 3, then we will try to find about
+   *      30,000 features. The final model is then computed with L2
+   *      regularization with those reduced features.
+   *
+   *   defaultOptions: Default options passed to the underlying Vowpal
+   *      Wabbit classifier.
+   *
+   *   extraOptions: Additional options to pass to the underlying classifier.
+   */
+  case class Options(
+    hashingOptions: HashingOptions,
+    regularization: Double = 1.0,
+    verbose: Boolean = false,
+    featureSelectionMultiple: Option[Int] = None,
+    defaultOptions: String = "--bfgs --passes 100 --loss_function logistic --holdout_off",
+    extraOptions: String = "")
+}
 
 /**
  * Utilities for training Vowpal classifiers and reading the resulting
  * parameters.
  */
-object VowpalClassifier extends LinearClassifierTrainer {
+class VowpalTrainer(
+    options: VowpalTrainer.Options,
+    filePrefix: String = "train") extends LinearClassifierTrainer {
 
   import sys.process._
   import java.io.File
   import math.{ max, min, log, exp, ceil, floor }
+  import LinearClassifierTrainer.tmpFile
 
   /**
    * Train a Vowpal classifier. Currently fixes most of the options to
    * reasonable values for some of our standard use cases.
    */
-  def train(trainingExamples: TraversableOnce[Example[String, String]],
-    options: VowpalClassifierOptions,
-    filePrefix: String = "train") = {
+  def train(trainingExamples: TraversableOnce[Example[String, String]]) = {
 
     // Create the files used and produced by Vowpal.
     val trainingFile = tmpFile(s"$filePrefix-vw-training-final-")

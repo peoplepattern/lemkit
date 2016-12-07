@@ -3,45 +3,48 @@ package com.peoplepattern.classify
 import data._
 import scala.io.Source
 
-/**
- * The options for LIBLINEAR classifier learning.
- *
- *   hashingOptions: Options for feature hashing.
- *
- *   regularization: The value for L2 regularization.
- *
- *   verbose: Useful for debugging. If true, don't delete tmp files when
- *      program exits, don't suppress verbose output from LIBLINEAR, and output
- *      various status messages.
- *
- *   defaultOptions: Default options passed to the underlying LIBLINEAR
- *      classifier.
- *
- *   extraOptions: Additional options to pass to the underlying classifier.
- */
-case class LibLinearClassifierOptions(hashingOptions: HashingOptions,
-  var regularization: Double = 1.0,
-  var verbose: Boolean = false,
-  var defaultOptions: String = "-s 7",
-  var extraOptions: String = "")
+object LibLinearTrainer {
+  /**
+   * The options for LIBLINEAR classifier learning.
+   *
+   *   hashingOptions: Options for feature hashing.
+   *
+   *   regularization: The value for L2 regularization.
+   *
+   *   verbose: Useful for debugging. If true, don't delete tmp files when
+   *      program exits, don't suppress verbose output from LIBLINEAR, and output
+   *      various status messages.
+   *
+   *   defaultOptions: Default options passed to the underlying LIBLINEAR
+   *      classifier.
+   *
+   *   extraOptions: Additional options to pass to the underlying classifier.
+   */
+  case class Options(hashingOptions: HashingOptions,
+    regularization: Double = 1.0,
+    verbose: Boolean = false,
+    defaultOptions: String = "-s 7",
+    extraOptions: String = "")
+}
 
 /**
  * Utilities for training LIBLINEAR classifiers and reading the resulting
  * parameters.
  */
-object LibLinearClassifier extends LinearClassifierTrainer {
+class LibLinearTrainer(
+    options: LibLinearTrainer.Options,
+    filePrefix: String = "train") extends LinearClassifierTrainer {
 
   import sys.process._
   import java.io.File
   import math.{ max, min, log, exp, ceil, floor }
+  import LinearClassifierTrainer.tmpFile
 
   /**
    * Train a LIBLINEAR classifier. Currently fixes most of the options to
    * reasonable values for some of our standard use cases.
    */
-  def train(trainingExamples: TraversableOnce[Example[String, String]],
-    options: LibLinearClassifierOptions,
-    filePrefix: String = "train") = {
+  def train(trainingExamples: TraversableOnce[Example[String, String]]) = {
 
     // Create the files used and produced by LIBLINEAR.
     val trainingFile = tmpFile(s"$filePrefix-liblinear-training-")
@@ -66,7 +69,7 @@ object LibLinearClassifier extends LinearClassifierTrainer {
     val quietOption = if (options.verbose) "" else "--quiet"
 
     val filteredFmapOpt: Option[FeatureMap] = None
-    // FIXME!! Implement L1 regularization like is done in VowpalClassifier
+    // FIXME!! Implement L1 regularization like is done in VowpalTrainer
 
     // Depending on the outcome of the attempt to reduce the number of features
     // with L1 feature selection, return either the filtered data/feature-map,

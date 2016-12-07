@@ -172,11 +172,11 @@ abstract class ClassifierBase(method: String) extends FlatSpec {
       val trainResource = readDatasetResource(resource)
       val hashOptions = new HashingOptions(hashtrick = hashtrick)
       if (method == "vowpal") {
-        val options = VowpalClassifierOptions(hashOptions)
-        VowpalClassifier.train(trainResource, options)
+        val options = VowpalTrainer.Options(hashOptions)
+        new VowpalTrainer(options).train(trainResource)
       } else {
-        val options = LibLinearClassifierOptions(hashOptions)
-        LibLinearClassifier.train(trainResource, options)
+        val options = LibLinearTrainer.Options(hashOptions)
+        new LibLinearTrainer(options).train(trainResource)
       }
     }
 

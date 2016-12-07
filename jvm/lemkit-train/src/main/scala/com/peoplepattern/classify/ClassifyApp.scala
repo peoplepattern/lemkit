@@ -107,21 +107,23 @@ object ClassifyApp extends App {
       val trainData = ClassifierSource.readDataFile(file)
       method match {
         case "vowpal" => {
-          val options = VowpalClassifierOptions(hashOptions)
-          regularization.map { options.regularization = _ }
-          options.verbose = verbose
-          options.featureSelectionMultiple = featureSelectionMultiple
-          defaultOptions.map { options.defaultOptions = _ }
-          extraOptions.map { options.extraOptions = _ }
-          VowpalClassifier.train(trainData, options)
+          var options = VowpalTrainer.Options(
+            hashOptions,
+            verbose = verbose,
+            featureSelectionMultiple = featureSelectionMultiple)
+          regularization.foreach { x => options = options.copy(regularization = x) }
+          defaultOptions.foreach { x => options = options.copy(defaultOptions = x) }
+          extraOptions.foreach { x => options = options.copy(extraOptions = x) }
+          new VowpalTrainer(options).train(trainData)
         }
         case "liblinear" => {
-          val options = LibLinearClassifierOptions(hashOptions)
-          regularization.map { options.regularization = _ }
-          options.verbose = verbose
-          defaultOptions.map { options.defaultOptions = _ }
-          extraOptions.map { options.extraOptions = _ }
-          LibLinearClassifier.train(trainData, options)
+          var options = LibLinearTrainer.Options(
+            hashOptions,
+            verbose = verbose)
+          regularization.foreach { x => options = options.copy(regularization = x) }
+          defaultOptions.foreach { x => options = options.copy(defaultOptions = x) }
+          extraOptions.foreach { x => options = options.copy(extraOptions = x) }
+          new LibLinearTrainer(options).train(trainData)
         }
       }
     }
