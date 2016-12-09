@@ -43,6 +43,17 @@ def unitFilter(name: String): Boolean =
   (name endsWith "Spec") && !vowpalFilter(name) && !libLinearFilter(name)
 def allFilter(name: String): Boolean = name endsWith "Spec"
 
+lazy val lkCore = project
+  .in(file("lemkit-core"))
+  .settings(
+    name := "lemkit-core",
+    organization := "com.peoplepattern",
+    description := "Core data structures for linear classification",
+    publishMavenStyle := true,
+    crossPaths := false,
+    autoScalaLibrary := false
+  )
+
 lazy val lkTrain = project
   .in(file("lemkit-train"))
   .settings(
@@ -69,4 +80,4 @@ lazy val root = project
   .in(file("."))
   .settings(name := "lemkit")
   .settings(commonSettings: _*)
-  .aggregate(lkModel, lkTrain)
+  .aggregate(lkCore, lkModel, lkTrain)
