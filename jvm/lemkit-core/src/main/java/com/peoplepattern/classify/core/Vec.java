@@ -111,9 +111,8 @@ final class Vec implements Serializable {
   }
 
   private static boolean sparseSparseEq(final Vec a, final Vec b) {
-    return a.size == b.size &&
-      Arrays.equals(a.sparseIndices, b.sparseIndices) &&
-      Arrays.equals(a.sparseValues, b.sparseValues);
+    return a.size == b.size && Arrays.equals(a.sparseIndices, b.sparseIndices)
+        && Arrays.equals(a.sparseValues, b.sparseValues);
   }
 
   private static boolean sparseDenseEq(final Vec sparse, final Vec dense) {
@@ -123,9 +122,8 @@ final class Vec implements Serializable {
     int j = 0;
     for (int i = 0; i < dense.size; i++) {
       if (dense.denseValues[i] != 0.0) {
-        if (j > sparse.sparseIndices.length ||
-            sparse.sparseIndices[j] != i ||
-            sparse.sparseValues[j] != dense.denseValues[i]) {
+        if (j > sparse.sparseIndices.length || sparse.sparseIndices[j] != i
+            || sparse.sparseValues[j] != dense.denseValues[i]) {
           return false;
         } else {
           j++;

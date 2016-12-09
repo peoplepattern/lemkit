@@ -9,3 +9,5 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.3")
 addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.5")
 
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-M15")
+
+addSbtPlugin("com.lightbend.sbt" % "sbt-java-formatter" % "0.2.0")
