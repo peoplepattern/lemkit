@@ -243,6 +243,7 @@ final class Vec implements Serializable {
       String msg = format(templ, size, vec.size);
       throw new IllegalArgumentException(msg);
     }
+
     if (isSparse && vec.isSparse) {
       return sparseSparseDot(this, vec);
     } else if (isSparse && !vec.isSparse) {
