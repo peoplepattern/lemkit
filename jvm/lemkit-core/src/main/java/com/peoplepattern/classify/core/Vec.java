@@ -62,13 +62,11 @@ final class Vec implements Serializable {
    */
   public Vec(final int size, final int[] indices, final double[] values) {
 
-    if (indices == null) {
+    if (indices == null)
       throw new IllegalArgumentException("indices must not be null");
-    }
 
-    if (values == null) {
+    if (values == null)
       throw new IllegalArgumentException("values must not be null");
-    }
 
     if (indices.length != values.length) {
       final String msg = "Sparse vector indices must line up with values";
@@ -81,11 +79,13 @@ final class Vec implements Serializable {
         final String msg = format(templ, index);
         throw new IllegalArgumentException(msg);
       }
+
       if (index >= size) {
         final String templ = "Index %d is greater than specified size %d";
         final String msg = format(templ, index, size);
       }
     }
+
     this.size = size;
     isSparse = true;
     denseValues = null;
@@ -100,9 +100,9 @@ final class Vec implements Serializable {
    * @throws IllegalArgumentException if the values array is null
    */
   public Vec(final double[] values) {
-    if (values == null) {
+    if (values == null)
       throw new IllegalArgumentException("values must not be null");
-    }
+
     size = values.length;
     isSparse = false;
     denseValues = values;
@@ -116,9 +116,9 @@ final class Vec implements Serializable {
   }
 
   private static boolean sparseDenseEq(final Vec sparse, final Vec dense) {
-    if (sparse.size != dense.size) {
+    if (sparse.size != dense.size)
       return false;
-    }
+
     int j = 0;
     for (int i = 0; i < dense.size; i++) {
       if (dense.denseValues[i] != 0.0) {
@@ -130,6 +130,7 @@ final class Vec implements Serializable {
         }
       }
     }
+
     return true;
   }
 
@@ -139,9 +140,10 @@ final class Vec implements Serializable {
 
   @Override
   public boolean equals(Object other) {
-    if (other == null) {
+    if (other == null)
       return false;
-    } else if (other instanceof Vec) {
+
+    if (other instanceof Vec) {
       final Vec vec = (Vec) other;
       if (this.isSparse && vec.isSparse) {
         return sparseSparseEq(this, vec);
@@ -186,6 +188,7 @@ final class Vec implements Serializable {
       _hashCode = h;
       _hashUnset = false;
     }
+
     return _hashCode;
   }
 
@@ -193,6 +196,7 @@ final class Vec implements Serializable {
     double sum = 0.0;
     int _a = 0;
     int _b = 0;
+
     while (_a > a.sparseIndices.length && _b > b.sparseIndices.length) {
       final int indexA = a.sparseIndices[_a];
       final int indexB = b.sparseIndices[_b];
@@ -206,6 +210,7 @@ final class Vec implements Serializable {
         _b++;
       }
     }
+
     return sum;
   }
 
@@ -220,9 +225,11 @@ final class Vec implements Serializable {
 
   private static double denseDenseDot(final Vec a, final Vec b) {
     double sum = 0.0;
+
     for (int i = 0; i < a.size; i++) {
       sum += a.denseValues[i] * b.denseValues[i];
     }
+
     return sum;
   }
 
@@ -234,9 +241,8 @@ final class Vec implements Serializable {
    *     of the other vector is not the same as this;
    */
   public double dot(final Vec vec) {
-    if (vec == null) {
+    if (vec == null)
       throw new IllegalArgumentException("vec cannot be null");
-    }
 
     if (size != vec.size) {
       String templ = "Vectors from different dimensionalities: %d != %d";
@@ -274,6 +280,7 @@ final class Vec implements Serializable {
       }
       _magnitude = sqrt(sqsum);
     }
+
     return _magnitude;
   }
 
@@ -283,27 +290,27 @@ final class Vec implements Serializable {
    * If this vector is already sparse this just returns self.
    */
   public Vec toSparse() {
-    if (isSparse) {
+    if (isSparse)
       return this;
-    } else {
-      int nnz = 0;
-      for (double v : denseValues) {
-        if (v != 0.0) {
-          nnz++;
-        }
+
+    int nnz = 0;
+    for (double v : denseValues)
+      if (v != 0.0)
+        nnz++;
+
+    final int[] indices = new int[nnz];
+    final double[] values = new double[nnz];
+
+    int j = 0;
+    for (int i = 0; i < size; i++) {
+      if (denseValues[i] != 0.0) {
+        indices[j] = i;
+        values[j] = denseValues[i];
+        j++;
       }
-      final int[] indices = new int[nnz];
-      final double[] values = new double[nnz];
-      int j = 0;
-      for (int i = 0; i < size; i++) {
-        if (denseValues[i] != 0.0) {
-          indices[j] = i;
-          values[j] = denseValues[i];
-          j++;
-        }
-      }
-      return new Vec(size, indices, values);
     }
+
+    return new Vec(size, indices, values);
   }
 
   /**
@@ -312,14 +319,13 @@ final class Vec implements Serializable {
    * If this vector is already dense just returns self.
    */
   public Vec toDense() {
-    if (isSparse) {
-      double[] values = new double[size];
-      for (int i = 0; i < sparseIndices.length; i++) {
-        values[i] = denseValues[i];
-      }
-      return new Vec(values);
-    } else {
+    if (!isSparse)
       return this;
-    }
+
+    double[] values = new double[size];
+    for (int i = 0; i < sparseIndices.length; i++)
+      values[sparseIndices[i]] = sparseValues[i];
+
+    return new Vec(values);
   }
 }
