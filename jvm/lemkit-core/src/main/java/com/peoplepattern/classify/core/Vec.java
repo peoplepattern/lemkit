@@ -143,19 +143,18 @@ final class Vec implements Serializable {
     if (other == null)
       return false;
 
-    if (other instanceof Vec) {
-      final Vec vec = (Vec) other;
-      if (this.isSparse && vec.isSparse) {
-        return sparseSparseEq(this, vec);
-      } else if (this.isSparse && !vec.isSparse) {
-        return sparseDenseEq(this, vec);
-      } else if (!this.isSparse && vec.isSparse) {
-        return sparseDenseEq(vec, this);
-      } else {
-        return denseDenseEq(this, vec);
-      }
-    } else {
+    if (!(other instanceof Vec))
       return false;
+
+    final Vec vec = (Vec) other;
+    if (this.isSparse && vec.isSparse) {
+      return sparseSparseEq(this, vec);
+    } else if (this.isSparse && !vec.isSparse) {
+      return sparseDenseEq(this, vec);
+    } else if (!this.isSparse && vec.isSparse) {
+      return sparseDenseEq(vec, this);
+    } else {
+      return denseDenseEq(this, vec);
     }
   }
 
