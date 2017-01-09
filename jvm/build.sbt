@@ -51,7 +51,15 @@ lazy val lkCore = project
     description := "Core data structures for linear classification",
     publishMavenStyle := true,
     crossPaths := false,
-    autoScalaLibrary := false
+    autoScalaLibrary := false,
+    libraryDependencies ++= Seq(
+      "it.unimi.dsi" % "fastutil" % "7.0.13",
+      "com.eclipsesource.minimal-json" % "minimal-json" % "0.9.4",
+      "com.novocode" % "junit-interface" % "0.11" % "test"),
+    javacOptions in compile ++= Seq("-Xlint:all", "-Xdiags:verbose"),
+    javacOptions in doc ++= Seq(
+      "-link", "http://docs.oracle.com/javase/7/docs/api",
+      "-public")
   )
 
 lazy val lkTrain = project
