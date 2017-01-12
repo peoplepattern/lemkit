@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Test;
 
-import static com.peoplepattern.classify.core.Classification.logistic;
+import static com.peoplepattern.classify.core.Util.logistic;
 import static org.junit.Assert.*;
 
 public class ClassificationTest {

@@ -13,8 +13,9 @@ import java.util.TreeSet;
 
 import static com.peoplepattern.classify.core.JsonSupport.*;
 import static com.peoplepattern.classify.core.Scored.maxByScore;
+import static com.peoplepattern.classify.core.Util.logistic;
+import static com.peoplepattern.classify.core.Util.sorted;
 import static java.lang.String.format;
-import static java.lang.Math.exp;
 import static java.util.Arrays.binarySearch;
 
 /**
@@ -29,40 +30,21 @@ public final class Classification implements Serializable, JsonSupport {
   final static long serialVersionUID = 1L;
 
   private final String best;
-  private final SortedSet<Scored<String>> scoredLabels;
-  private transient String[] _labels = null;
+  private final String[] labels;
+  private final double[] scores;
   private transient double[] _probabilities = null;
 
-  private static SortedSet<Scored<String>> mkset(final String[] labels, final double scores[]) {
-
-    if (labels == null)
-      throw new IllegalArgumentException("labels cannot be null");
-
-    if (scores == null)
-      throw new IllegalArgumentException("scores cannot be null");
-
-    if (labels.length != scores.length) {
-      final String msg = "must have same number of labels as scores";
-      throw new IllegalArgumentException(msg);
-    }
-
-    if (labels.length == 0) {
-      final String msg = "trivial classification with no scores";
-      throw new IllegalArgumentException(msg);
-    }
-
-    final SortedSet<Scored<String>> set = new TreeSet<Scored<String>>();
-
-    for (int i = 0; i < labels.length; i++)
-      set.add(new Scored<String>(labels[i], scores[i]));
-
-    return set;
-  }
-
   public Classification(final SortedSet<Scored<String>> scores) {
-    this.scoredLabels = scores;
-    final Scored<String> bestScored = maxByScore(scores);
-    this.best = bestScored.item();
+    final int n = scores.size();
+    labels = new String[n];
+    this.scores = new double[n];
+    int i = 0;
+    for (Scored<String> s : scores) {
+      labels[i] = s.item();
+      this.scores[i] = s.score();
+      i++;
+    }
+    this.best = maxByScore(scores).item();
   }
 
   /**
@@ -75,7 +57,49 @@ public final class Classification implements Serializable, JsonSupport {
    *   scores array, of if the length of either is 0
    */
   public Classification(final String[] labels, final double[] scores) {
-    this(mkset(labels, scores));
+    if (labels == null)
+      throw new IllegalArgumentException("labels cannot be null");
+
+    if (scores == null)
+      throw new IllegalArgumentException("scores cannot be null");
+
+    final int n = labels.length;
+
+    if (n != scores.length) {
+      final String msg = "must have same number of labels as scores";
+      throw new IllegalArgumentException(msg);
+    }
+
+    if (n == 0) {
+      final String msg = "trivial classification with no scores";
+      throw new IllegalArgumentException(msg);
+    }
+
+    if (sorted(labels)) {
+      this.labels = labels;
+      this.scores = scores;
+      this.best = argmax(labels, scores);
+    } else {
+
+      this.labels = new String[n];
+      this.scores = new double[n];
+
+      {
+        final SortedSet<Scored<String>> set = new TreeSet<Scored<String>>();
+
+        for (int i = 0; i < n; i++)
+          set.add(new Scored<String>(labels[i], scores[i]));
+
+        int i = 0;
+        for (Scored<String> s : set) {
+          this.labels[i] = s.item();
+          this.scores[i] = s.score();
+          i++;
+        }
+
+        this.best = argmax(this.labels, this.scores);
+      }
+    }
   }
 
   /**
@@ -96,53 +120,42 @@ public final class Classification implements Serializable, JsonSupport {
    * @return the set of labels in this classification, sorted
    */
   public String[] labels() {
-    final String[] labels = new String[scoredLabels.size()];
-    int i = 0;
-    for (Scored<String> s : scoredLabels)
-      labels[i++] = s.item();
     return labels;
-  }
-
-  public static double logistic(final double x) {
-    return 1.0 / (1.0 + exp(-x));
   }
 
   /**
    * Logistic regression class prediction probabilities
+   *
+   * @return the logistic regression probabilities of class labels; these
+   *     values will sum to 1.0; the individual probabilities correspond
+   *     to the class labels in {@link #labels}
    */
   public double[] probabilities() {
-    final double[] scores = new double[scoredLabels.size()];
-    int i = 0;
-    for (Scored<String> s : scoredLabels)
-      scores[i++] = s.score();
-
-    // scores() generates new array, so don't worry we're changing it
     final int n = scores.length;
+    final double[] probs = Arrays.copyOf(scores, n);
+
     for (int j = 0; j < n; j++)
-      scores[j] = logistic(scores[j]);
+      probs[j] = logistic(probs[j]);
 
     final double sum;
     {
       double s = 0;
       for (int j = 0; j < n; j++)
-        s += scores[j];
+        s += probs[j];
       sum = s;
     }
 
     for (int j = 0; j < n; j++)
-      scores[j] /= sum;
+      probs[j] /= sum;
 
-    return scores;
+    return probs;
   }
 
   public double probabilityOf(final String label) {
     if (_probabilities == null)
       _probabilities = probabilities();
 
-    if (_labels == null)
-      _labels = labels();
-
-    final int i = binarySearch(_labels, label);
+    final int i = binarySearch(labels, label);
     if (i < 0)
       throw new IllegalArgumentException(format("Unknown label: %s", label));
 
@@ -167,12 +180,12 @@ public final class Classification implements Serializable, JsonSupport {
 
     final Classification c = (Classification) other;
 
-    return scoredLabels.equals(c.scoredLabels);
+    return Arrays.equals(labels, c.labels) && Arrays.equals(scores, c.scores);
   }
 
   @Override
   public int hashCode() {
-    return 23 * scoredLabels.hashCode();
+    return 23 * Arrays.hashCode(labels) + 31 * Arrays.hashCode(scores);
   }
 
   @Override
@@ -183,7 +196,13 @@ public final class Classification implements Serializable, JsonSupport {
   public JsonValue toJson() {
     final JsonObject j = Json.object();
     j.add("best", best);
-    j.add("scores", Scored.asJsonObject(scoredLabels));
+
+    final JsonObject scoresJ = Json.object();
+    for (int i = 0; i < labels.length; i++) {
+      scoresJ.add(labels[i], scores[i]);
+    }
+
+    j.add("scores", scoresJ);
     return j;
   }
 
@@ -205,15 +224,36 @@ public final class Classification implements Serializable, JsonSupport {
             throw new IllegalArgumentException("\"scores\" value not a JSON object");
 
           final JsonObject scoresO = scoresJ.asObject();
-          final List<Scored<String>> scores = new ArrayList<Scored<String>>();
+
+          int i = 0;
+          final int n = scoresO.size();
+
+          final String[] labels = new String[n];
+          final double[] scores = new double[n];
+
           for (Member m : scoresO) {
             final JsonValue v = m.getValue();
             if (!v.isNumber())
               throw new IllegalArgumentException("Scores must be numbers");
 
-            scores.add(new Scored<String>(m.getName(), v.asDouble()));
+            labels[i] = m.getName();
+            scores[i] = v.asDouble();
+            i++;
           }
-          return new Classification(new ProbablySortedSet<Scored<String>>(scores));
+
+          return new Classification(labels, scores);
         }
       };
+
+  private static String argmax(final String[] labels, final double[] scores) {
+    int index = -1;
+    double max = Double.NEGATIVE_INFINITY;
+    for (int i = 0; i < labels.length; i++) {
+      if (scores[i] > max) {
+        max = scores[i];
+        index = i;
+      }
+    }
+    return labels[index];
+  }
 }

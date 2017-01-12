@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.peoplepattern.classify.core.ClassifierIO.*;
+import static com.peoplepattern.classify.core.Util.sorted;
 import static java.lang.Math.exp;
 
 /**
@@ -34,17 +35,6 @@ public class LinearClassifier implements Classifier<Datum>, Serializable {
   private final String[] labels;
 
   private final long functionSig;
-
-  private static boolean sorted(final String[] labels) {
-    if (labels.length < 2)
-      return true;
-
-    for (int i = 0; i < labels.length - 1; i++)
-      if (labels[i].compareTo(labels[i + 1]) > 0)
-        return false;
-
-    return true;
-  }
 
   private static class Pair implements Comparable<Pair> {
     final String label;
@@ -144,12 +134,7 @@ public class LinearClassifier implements Classifier<Datum>, Serializable {
     for (int i = 0; i < n; i++)
       scores[i] = parameters[i].dot(datumVec);
 
-    final List<Scored<String>> scored = new ArrayList<Scored<String>>(parameters.length);
-
-    for (int i = 0; i < n; i++)
-      scored.add(new Scored<String>(labels[i], scores[i]));
-
-    return new Classification(new ProbablySortedSet<Scored<String>>(scored));
+    return new Classification(labels, scores);
   }
 
   public long functionSig() {

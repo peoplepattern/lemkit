@@ -90,6 +90,7 @@ public interface FeatureMap {
    *
    * @param functionSig the feature function signature, probably stored earlier
    *                    in the data stream
+   * @return a new binary reader for feature maps
    */
   public static BinarySupport.BinaryReader<FeatureMap> binaryReader(final long functionSig) {
     return new BinarySupport.BinaryReader<FeatureMap>() {
@@ -125,6 +126,7 @@ public interface FeatureMap {
    *
    * @param functionSig the signature of the feature function of the
    *                    containing object
+   * @return a new JSON reader for feature maps
    */
   public static JsonSupport.Parser<FeatureMap> jsonReader(final long functionSig) {
     return new JsonSupport.Parser<FeatureMap>() {
