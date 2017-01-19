@@ -91,9 +91,15 @@ class LibLinearTrainer(
       for (ex <- trainingExamples) {
         numExamples += 1
         val labelInt = labelIndexer(ex.label) + 1
-        val feats = for (obs <- ex.item.observations.asScala) yield {
-          s"${1 + featureIndexer(obs.item)}:${obs.score}"
+
+        val featsInts = for (obs <- ex.item.observations.asScala) yield {
+          (featureIndexer(obs.item), obs.score)
         }
+
+        val feats = for ((feat, score) <- featsInts.toVector.sorted) yield {
+          s"${1 + feat}:$score"
+        }
+
         trainOut.write(s"+$labelInt ${feats.mkString(" ")}\n")
       }
     } finally {

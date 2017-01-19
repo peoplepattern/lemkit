@@ -14,28 +14,23 @@ object VowpalTrainer {
   /**
    * The options for Vowpal classifier learning.
    *
-   *   hashingOptions: Options for feature hashing.
-   *
-   *   regularization: The value for L2 regularization.
-   *
-   *   verbose: Useful for debugging. If true, don't delete tmp files when
+   * @param hashing Options for feature hashing.
+   * @param regularization The value for L2 regularization.
+   * @param verbose Useful for debugging. If true, don't delete tmp files when
    *      program exits, don't suppress verbose output from Vowpal, and output
    *      various status messages.
-   *
-   *   featureSelectionMultiple: Perform L1 feature selection. The Int value
+   * @param featureSelectionMultiple Perform L1 feature selection. The Int value
    *      provided indicates the multiple of the number of training instances
    *      to use as a cutoff. For example, if there are 10,000 training
    *      instances and the multiple is 3, then we will try to find about
    *      30,000 features. The final model is then computed with L2
    *      regularization with those reduced features.
-   *
-   *   defaultOptions: Default options passed to the underlying Vowpal
+   * @param defaultOptions Default options passed to the underlying Vowpal
    *      Wabbit classifier.
-   *
-   *   extraOptions: Additional options to pass to the underlying classifier.
+   * @param extraOptions Additional options to pass to the underlying classifier.
    */
   case class Options(
-    hashingOptions: HashingOptions,
+    hashing: HashingOptions = HashingOptions(),
     regularization: Double = 1.0,
     verbose: Boolean = false,
     featureSelectionMultiple: Option[Int] = None,
@@ -48,7 +43,7 @@ object VowpalTrainer {
  * parameters.
  */
 class VowpalTrainer(
-    options: VowpalTrainer.Options,
+    options: VowpalTrainer.Options = VowpalTrainer.Options(),
     filePrefix: String = "train") extends LinearClassifierTrainer {
 
   import sys.process._
@@ -58,7 +53,7 @@ class VowpalTrainer(
 
   val quietOption = if (options.verbose) "" else "--quiet"
 
-  val useHashtrick = options.hashingOptions.hashtrick != None
+  val useHashtrick = options.hashing.hashtrick != None
 
   val doFeatureSelection = options.featureSelectionMultiple != None
 
@@ -84,7 +79,7 @@ class VowpalTrainer(
       paramsL1File.deleteOnExit
     }
 
-    val featureIndexer = options.hashingOptions.hashtrick match {
+    val featureIndexer = options.hashing.hashtrick match {
       case Some(n) => new HashingIndexer(functionSig, n)
       case None => new CounterIndexer(functionSig)
     }
@@ -354,8 +349,13 @@ class VowpalTrainer(
     numFeatures: Int): Array[Vec] = {
     val bitsToShift = getBitShift(numClasses)
     val parameters = Array.fill(numClasses, numFeatures)(0.0)
+    // Read the file until after the :0 symbol
+    val lines = Source.fromFile(paramsFile)
+      .getLines
+      .dropWhile(_.trim != ":0")
+      .drop(1)
     for {
-      line <- Source.fromFile(paramsFile).getLines.drop(12)
+      line <- lines
       Array(indexString, weightString) = line.split(":")
       (parameterIndex, classIndex) = getOriginalIndices(indexString.toInt,
         bitsToShift)
