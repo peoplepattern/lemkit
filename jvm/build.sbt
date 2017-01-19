@@ -21,17 +21,17 @@ lazy val commonSettings = Seq(
   )
 ) ++ scalariformSettings
 
-lazy val lkModel = project
-  .in(file("lemkit-model"))
-  .settings(
-    name := "lemkit-model",
-    libraryDependencies ++= Seq(
-      "net.liftweb" %% "lift-json" % "2.6-RC1",
-      "org.scalatest" %% "scalatest" % "2.2.4" % "test"
-    )
-  )
-  .settings(commonSettings: _*)
-  .settings(packageArchetype.java_application)
+// lazy val lkModel = project
+//   .in(file("lemkit-model"))
+//   .settings(
+//     name := "lemkit-model",
+//     libraryDependencies ++= Seq(
+//       "net.liftweb" %% "lift-json" % "2.6-RC1",
+//       "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+//     )
+//   )
+//   .settings(commonSettings: _*)
+//   .settings(packageArchetype.java_application)
 
 lazy val AllTest = config("all") extend (Test)
 lazy val VowpalTest = config("vowpal") extend (Test)
@@ -82,10 +82,10 @@ lazy val lkTrain = project
             testOptions in VowpalTest := Seq(Tests.Filter(vowpalFilter)),
             testOptions in LibLinearTest := Seq(Tests.Filter(libLinearFilter)))
   .settings(packageArchetype.java_application)
-  .dependsOn(lkModel)
+  .dependsOn(lkCore)
 
 lazy val root = project
   .in(file("."))
   .settings(name := "lemkit")
   .settings(commonSettings: _*)
-  .aggregate(lkCore, lkModel, lkTrain)
+  .aggregate(lkCore, lkTrain)

@@ -1,4 +1,4 @@
-package com.peoplepattern.classify
+package com.peoplepattern.classify.train
 
 /**
  * The options for hashing for a classifier.

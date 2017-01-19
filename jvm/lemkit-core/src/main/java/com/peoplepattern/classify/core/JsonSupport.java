@@ -2,6 +2,11 @@ package com.peoplepattern.classify.core;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonValue;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -40,6 +45,21 @@ public interface JsonSupport {
    */
   default String toJsonString() {
     return toJson().toString();
+  }
+
+  /**
+   * Write JSON format to a file
+   *
+   * @param f the file to write to
+   * @throws IOException if any problems occur while writing
+   */
+  default void writeJson(File f) throws IOException {
+    final Writer writer = new BufferedWriter(new FileWriter(f));
+    try {
+      writeJson(writer);
+    } finally {
+      writer.close();
+    }
   }
 
   /**
@@ -90,6 +110,24 @@ public interface JsonSupport {
      */
     default A readJson(final Reader reader) throws IOException {
       return fromJson(Json.parse(reader));
+    }
+
+    /**
+     * Read JSON from a file, translate into an object
+     *
+     * @param file the file to read JSON content from
+     * @return a deserialized object
+     * @throws IOException if any problems occur with the IO read
+     * @throws IllegalArgumentException if any fields are missing, or the JSON
+     *         is in an unexpected format
+     */
+    default A readJson(final File file) throws IOException {
+      final Reader reader = new BufferedReader(new FileReader(file));
+      try {
+        return readJson(reader);
+      } finally {
+        reader.close();
+      }
     }
   }
 }

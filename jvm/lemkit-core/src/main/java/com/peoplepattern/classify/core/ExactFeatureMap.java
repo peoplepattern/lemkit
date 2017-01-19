@@ -26,8 +26,10 @@ public final class ExactFeatureMap implements FeatureMap, Serializable, JsonSupp
   private final long sig;
   private final Object2IntMap<String> hash;
   private final String[] features;
+  private final boolean addIntercept;
+  private final int size;
 
-  public ExactFeatureMap(final long functionSig, final String[] features) {
+  public ExactFeatureMap(final long functionSig, final String[] features, final boolean addIntercept) {
     if (features == null)
       throw new IllegalArgumentException("Features values cannot be null");
 
@@ -41,10 +43,27 @@ public final class ExactFeatureMap implements FeatureMap, Serializable, JsonSupp
     for (int i = 0; i < features.length; i++) {
       hash.put(features[i], i);
     }
+
+    if (addIntercept && !hash.containsKey("")) {
+      hash.put("", features.length);
+      size = features.length + 1;
+    } else {
+      size = features.length;
+    }
+
+    this.addIntercept = addIntercept;
+  }
+
+  public ExactFeatureMap(final long functionSig, final String[] features) {
+    this(functionSig, features, true);
   }
 
   public long functionSig() {
     return sig;
+  }
+
+  public boolean addIntercept() {
+    return addIntercept;
   }
 
   /**
@@ -65,7 +84,7 @@ public final class ExactFeatureMap implements FeatureMap, Serializable, JsonSupp
   }
 
   public int size() {
-    return features.length;
+    return size;
   }
 
   public void writeToStream(final DataOutputStream out) throws IOException {

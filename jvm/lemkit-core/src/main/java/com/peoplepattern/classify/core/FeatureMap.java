@@ -59,6 +59,20 @@ public interface FeatureMap {
   public long functionSig();
 
   /**
+   * Whether an intercept value of 1.0 should be added the feature vector
+   * when this feature map is used to convert {@link FeatureBundle} to
+   * {@link Datum}
+   *
+   * <p>By convention the "feature" value for the intercept parameter is ""
+   *
+   * <p>Usually this should be set to true for most linear classifiers.
+   *
+   * @return true if an intercept parameter should be added to feature vectors
+   *   being generated from feature bundles
+   */
+  public boolean addIntercept();
+
+  /**
    * Write to to a stream
    *
    * <p>The feature map is written efficiently to a binary stream.

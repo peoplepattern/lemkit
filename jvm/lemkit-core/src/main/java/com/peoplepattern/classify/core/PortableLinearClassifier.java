@@ -80,7 +80,7 @@ public final class PortableLinearClassifier implements Classifier<FeatureBundle>
           {
             final short minorVer = in.readShort();
             if (minorVer != MINOR_VERSION)
-              throw new IOException(format("Invalide minor version: %d", minorVer));
+              throw new IOException(format("Invalid minor version: %d", minorVer));
           }
 
           final long functionSig = in.readLong();

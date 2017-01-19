@@ -32,6 +32,27 @@ public class HashedFeatureMap implements FeatureMap, Serializable, BinarySupport
   private final int seed;
   private final long sig;
   private final int size;
+  private final boolean addIntercept;
+
+  /**
+   * Consturct from a feature function signature, the size of the vector space
+   * being targeted, and a seed for the hash function
+   *
+   * @param functionSig the unique signature of the featue function used to
+   *             create the features this map will operate on
+   * @param size the length of the vectors to be created; the
+   *             {@link #indexOfFeature} method will not generate a number
+   *             greater-than-or-equal to this value
+   * @param seed a seed for the underlying MurmurHash3
+   * @param addIntercept whether to add an intercept value to the feature vector
+   */
+  public HashedFeatureMap(final long functionSig, final int size, final int seed,
+      final boolean addIntercept) {
+    this.seed = seed;
+    this.sig = functionSig;
+    this.size = size;
+    this.addIntercept = addIntercept;
+  }
 
   /**
    * Consturct from a feature function signature, the size of the vector space
@@ -45,9 +66,12 @@ public class HashedFeatureMap implements FeatureMap, Serializable, BinarySupport
    * @param seed a seed for the underlying MurmurHash3
    */
   public HashedFeatureMap(final long functionSig, final int size, final int seed) {
-    this.seed = seed;
-    this.sig = functionSig;
-    this.size = size;
+    this(functionSig, size, seed, true);
+  }
+
+
+  public boolean addIntercept() {
+    return addIntercept;
   }
 
   /**

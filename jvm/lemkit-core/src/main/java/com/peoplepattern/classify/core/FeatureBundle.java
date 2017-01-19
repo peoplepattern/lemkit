@@ -4,7 +4,9 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import it.unimi.dsi.fastutil.ints.Int2DoubleRBTreeMap;
@@ -53,6 +55,10 @@ public final class FeatureBundle implements Serializable, JsonSupport {
     this(sig, mkset(obs));
   }
 
+  public List<Scored<String>> observations() {
+    return new ArrayList<Scored<String>>(observations);
+  }
+
   public Datum toDatum(final FeatureMap map, final boolean sparse) {
 
     if (map == null) {
@@ -60,7 +66,7 @@ public final class FeatureBundle implements Serializable, JsonSupport {
     }
 
     if (sig != map.functionSig()) {
-      final String tmpl = "map has inconsistend sig: %d expected: %d";
+      final String tmpl = "map has inconsistent sig: %d expected: %d";
       final String msg = format(tmpl, map.functionSig(), sig);
       throw new IllegalArgumentException(msg);
     }
@@ -70,6 +76,9 @@ public final class FeatureBundle implements Serializable, JsonSupport {
       final Int2DoubleRBTreeMap sort = new Int2DoubleRBTreeMap();
       for (Scored<String> o : observations)
         sort.addTo(map.indexOfFeature(o.item()), o.score());
+
+      if (map.addIntercept())
+        sort.put(map.indexOfFeature(""), 1.0);
 
       final int n = sort.size();
       final int[] indices = new int[n];
@@ -89,6 +98,9 @@ public final class FeatureBundle implements Serializable, JsonSupport {
       final double[] params = new double[map.size()];
       for (Scored<String> o : observations)
         params[map.indexOfFeature(o.item())] += o.score();
+
+      if (map.addIntercept())
+        params[map.indexOfFeature("")] = 1.0;
 
       return new Datum(sig, new Vec(params));
     }
