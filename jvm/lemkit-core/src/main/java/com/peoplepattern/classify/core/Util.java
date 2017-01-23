@@ -15,8 +15,4 @@ class Util {
 
     return true;
   }
-
-  public static double logistic(final double x) {
-    return 1.0 / (1.0 + exp(-x));
-  }
 }

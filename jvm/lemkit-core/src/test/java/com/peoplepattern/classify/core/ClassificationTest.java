@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.junit.Test;
 
-import static com.peoplepattern.classify.core.Util.logistic;
+import static java.lang.Math.exp;
 import static org.junit.Assert.*;
 
 public class ClassificationTest {
@@ -31,7 +31,7 @@ public class ClassificationTest {
   final double[] expectedScores = new double[] {0.1, 0.7, 0.2};
   {
     for (int i = 0; i < 3; i++)
-      expectedScores[i] = logistic(expectedScores[i]);
+      expectedScores[i] = exp(expectedScores[i]);
     double sum = 0.0;
     for (int i = 0; i < 3; i++)
       sum += expectedScores[i];

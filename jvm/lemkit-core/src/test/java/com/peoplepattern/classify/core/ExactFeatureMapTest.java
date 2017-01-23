@@ -21,10 +21,10 @@ public class ExactFeatureMapTest {
   final long sig1 = 1L;
   final long sig2 = 2L;
 
-  final ExactFeatureMap m11 = new ExactFeatureMap(sig1, feats1);
-  final ExactFeatureMap m11c = new ExactFeatureMap(sig1, feats1c);
-  final ExactFeatureMap m12 = new ExactFeatureMap(sig1, feats2);
-  final ExactFeatureMap m21 = new ExactFeatureMap(sig2, feats1);
+  final ExactFeatureMap m11 = new ExactFeatureMap(sig1, feats1, false);
+  final ExactFeatureMap m11c = new ExactFeatureMap(sig1, feats1c, false);
+  final ExactFeatureMap m12 = new ExactFeatureMap(sig1, feats2, false);
+  final ExactFeatureMap m21 = new ExactFeatureMap(sig2, feats1, false);
 
   @Test
   public void testIndexOfFeature() {

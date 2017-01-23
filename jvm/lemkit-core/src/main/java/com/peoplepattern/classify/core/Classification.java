@@ -13,8 +13,8 @@ import java.util.TreeSet;
 
 import static com.peoplepattern.classify.core.JsonSupport.*;
 import static com.peoplepattern.classify.core.Scored.maxByScore;
-import static com.peoplepattern.classify.core.Util.logistic;
 import static com.peoplepattern.classify.core.Util.sorted;
+import static java.lang.Math.exp;
 import static java.lang.String.format;
 import static java.util.Arrays.binarySearch;
 
@@ -124,18 +124,18 @@ public final class Classification implements Serializable, JsonSupport {
   }
 
   /**
-   * Logistic regression class prediction probabilities
+   * Class prediction probabilities
    *
-   * @return the logistic regression probabilities of class labels; these
-   *     values will sum to 1.0; the individual probabilities correspond
-   *     to the class labels in {@link #labels}
+   * @return the softmax probabilities of class labels; these values will
+   *     sum to 1.0; the individual probabilities correspond to the class
+   *     labels in {@link #labels}
    */
   public double[] probabilities() {
     final int n = scores.length;
     final double[] probs = Arrays.copyOf(scores, n);
 
     for (int j = 0; j < n; j++)
-      probs[j] = logistic(probs[j]);
+      probs[j] = exp(probs[j]);
 
     final double sum;
     {

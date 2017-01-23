@@ -21,29 +21,7 @@ lazy val commonSettings = Seq(
   )
 ) ++ scalariformSettings
 
-// lazy val lkModel = project
-//   .in(file("lemkit-model"))
-//   .settings(
-//     name := "lemkit-model",
-//     libraryDependencies ++= Seq(
-//       "net.liftweb" %% "lift-json" % "2.6-RC1",
-//       "org.scalatest" %% "scalatest" % "2.2.4" % "test"
-//     )
-//   )
-//   .settings(commonSettings: _*)
-//   .settings(packageArchetype.java_application)
-
-lazy val AllTest = config("all") extend (Test)
-lazy val VowpalTest = config("vowpal") extend (Test)
-lazy val LibLinearTest = config("liblinear") extend (Test)
-
-def vowpalFilter(name: String): Boolean = name endsWith "VowpalSpec"
-def libLinearFilter(name: String): Boolean = name endsWith "LibLinearSpec"
-def unitFilter(name: String): Boolean =
-  (name endsWith "Spec") && !vowpalFilter(name) && !libLinearFilter(name)
-def allFilter(name: String): Boolean = name endsWith "Spec"
-
-lazy val lkCore = project
+lazy val lemkitCore = project
   .in(file("lemkit-core"))
   .settings(
     name := "lemkit-core",
@@ -62,7 +40,7 @@ lazy val lkCore = project
       "-public")
   )
 
-lazy val lkTrain = project
+lazy val lemkitTrain = project
   .in(file("lemkit-train"))
   .settings(
     name := "lemkit-train",
@@ -71,21 +49,10 @@ lazy val lkTrain = project
     )
   )
   .settings(commonSettings: _*)
-  .configs(AllTest)
-  .configs(VowpalTest)
-  .configs(LibLinearTest)
-  .settings(inConfig(AllTest)(Defaults.testTasks): _*)
-  .settings(inConfig(VowpalTest)(Defaults.testTasks): _*)
-  .settings(inConfig(LibLinearTest)(Defaults.testTasks): _*)
-  .settings(testOptions in Test := Seq(Tests.Filter(unitFilter)),
-            testOptions in AllTest := Seq(Tests.Filter(allFilter)),
-            testOptions in VowpalTest := Seq(Tests.Filter(vowpalFilter)),
-            testOptions in LibLinearTest := Seq(Tests.Filter(libLinearFilter)))
-  .settings(packageArchetype.java_application)
-  .dependsOn(lkCore)
+  .dependsOn(lemkitCore)
 
 lazy val root = project
   .in(file("."))
   .settings(name := "lemkit")
   .settings(commonSettings: _*)
-  .aggregate(lkCore, lkTrain)
+  .aggregate(lemkitCore, lemkitTrain)

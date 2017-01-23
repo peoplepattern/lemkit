@@ -28,7 +28,7 @@ public class FeatureBundleTest {
   final FeatureBundle b21 = new FeatureBundle(2L, ss1);
   final FeatureBundle b12 = new FeatureBundle(1L, ss2);
 
-  final FeatureMap map = new ExactFeatureMap(1L, new String[] {"a", "b", "c"});
+  final FeatureMap map = new ExactFeatureMap(1L, new String[] {"a", "b", "c"}, false);
 
   final Datum d11 = new Datum(1L, new Vec(new double[] {0.1, 0.2, 0.7}));
 
