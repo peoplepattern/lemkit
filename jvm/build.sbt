@@ -37,7 +37,11 @@ lazy val lemkitCore = project
     javacOptions in compile ++= Seq("-Xlint:all", "-Xdiags:verbose"),
     javacOptions in doc ++= Seq(
       "-link", "http://docs.oracle.com/javase/7/docs/api",
-      "-public")
+      "-public"),
+    bintrayOrganization := Some("peoplepattern"),
+    bintrayReleaseOnPublish := true,
+    licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    homepage := Some(url("http://peoplepattern.github.io/lemkit"))
   )
 
 lazy val lemkitTrain = project
@@ -49,10 +53,18 @@ lazy val lemkitTrain = project
     )
   )
   .settings(commonSettings: _*)
+  .settings(
+    bintrayOrganization := Some("peoplepattern"),
+    bintrayReleaseOnPublish := true,
+    licenses := Seq("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    homepage := Some(url("http://peoplepattern.github.io/lemkit")))
   .dependsOn(lemkitCore)
 
 lazy val root = project
   .in(file("."))
   .settings(name := "lemkit")
   .settings(commonSettings: _*)
+  .settings(
+    publish := { },
+    bintrayUnpublish := { })
   .aggregate(lemkitCore, lemkitTrain)
