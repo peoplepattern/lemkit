@@ -74,8 +74,12 @@ public final class FeatureBundle implements Serializable, JsonSupport {
     if (sparse) {
 
       final Int2DoubleRBTreeMap sort = new Int2DoubleRBTreeMap();
-      for (Scored<String> o : observations)
-        sort.addTo(map.indexOfFeature(o.item()), o.score());
+      for (Scored<String> o : observations) {
+        final String key = o.item();
+        final int index = map.indexOfFeature(key);
+        if (index >= 0)
+          sort.addTo(index, o.score());
+      }
 
       if (map.addIntercept())
         sort.put(map.indexOfFeature(""), 1.0);
@@ -96,8 +100,11 @@ public final class FeatureBundle implements Serializable, JsonSupport {
     } else {
 
       final double[] params = new double[map.size()];
-      for (Scored<String> o : observations)
-        params[map.indexOfFeature(o.item())] += o.score();
+      for (Scored<String> o : observations) {
+        final int index = map.indexOfFeature(o.item());
+        if (index >= 0)
+          params[index] += o.score();
+      }
 
       if (map.addIntercept())
         params[map.indexOfFeature("")] = 1.0;
