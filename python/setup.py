@@ -9,7 +9,7 @@ config = {
   'description': 'Train and Predict using Linear Models',
   'author': 'People Pattern',
   'author_email': 'datasci@peoplepattern.com',
-  'version': '0.2',
+  'version': '0.3',
   'install_requires': ['nose','mmh3'],
   'packages': ['lemkit', 'lemkit.predict', 'lemkit.train'],
   'name': 'lemkit'
